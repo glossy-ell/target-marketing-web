@@ -47,14 +47,15 @@ export default function LoginForm() {
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl transition-all duration-300 transform hover:scale-105">
 
         <div className="w-full flex justify-center mb-6 h-20 overflow-hidden rounded-md">
-          <video
+          <img src="/logo.png" alt="logo" className="w-64 h-full object-cover" />
+          {/* <video
             src="/logo.mp4"
             autoPlay
             loop
             muted
             playsInline
             className="w-64 h-full object-cover"
-          />
+          /> */}
         </div>
 
         <input
@@ -79,7 +80,7 @@ export default function LoginForm() {
         <button
           onClick={handleLogin}
           disabled={loading}
-          className="w-full p-4 bg-[#6449FC] text-white font-semibold rounded-md hover:bg-[#5a3ee0] transition-all duration-300 disabled:opacity-50"
+          className="w-full p-4 bg-[#282828] text-white font-semibold rounded-md hover:bg-[#141414] transition-all duration-300 disabled:opacity-50"
         >
           {loading ? '로그인 중...' : '로그인'}
         </button>

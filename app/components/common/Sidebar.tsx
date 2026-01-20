@@ -68,14 +68,15 @@ export default function Sidebar() {
       <div>
         <Link href="/">
           <div className="w-full flex justify-center mb-6 h-20 overflow-hidden rounded-md cursor-pointer">
-            <video
+            <img src="/logo.png" alt="logo" className="w-64 h-full object-cover" />
+            {/* <video
               src="/logo.mp4"
               autoPlay
               loop
               muted
               playsInline
               className="w-64 h-full object-cover"
-            />
+            /> */}
           </div>
         </Link>
 
@@ -118,7 +119,7 @@ export default function Sidebar() {
                 사용자관리
               </Link>
             )}
-            
+
             {(userRole === 0 ) && (
               <Link
                 href="/extend-management"
