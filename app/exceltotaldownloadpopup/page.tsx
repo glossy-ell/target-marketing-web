@@ -1,16 +1,14 @@
 'use client';
 
+import SlotRankingModal from '@/components/modals/SlotRankingModal';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import { ko } from 'date-fns/locale';
+import { useEffect, useRef, useState } from 'react';
+import ReactDatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import SlotRankingModal from '@/components/modals/SlotRankingModal';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import * as XLSX from 'xlsx-js-style';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import 'react-datepicker/dist/react-datepicker.css';
-import ReactDatePicker from "react-datepicker";
-import { ko } from 'date-fns/locale';
 
 
 interface Slot {
@@ -98,7 +96,7 @@ const SlotList = () => {
 
   const [targetSlot,setTargetSlot] = useState<Slot[]>([]); //키워드
   const [targetLandingSlot,setTargetLandingSlot] = useState<Slot[]>([]); //키워드
-  
+
   const [menu,setMenu] = useState<number>(0);
 
   const [extraTime,setExtraTime] = useState<number>(0);
@@ -169,8 +167,8 @@ const SlotList = () => {
     if (event.origin !== window.location.origin) return;
     const { targetSlot,selectedIds } = event.data;
 
-  
-    
+
+
     // const filteredSlots = targetSlot.filter((slot:Slot) => slot.sortation === 1 || slot.sortation === 2);
     const filteredSlots = targetSlot;
     if(!filteredSlots){
@@ -209,10 +207,10 @@ const SlotList = () => {
 }, []);
 
 
- 
 
-  
-    
+
+
+
   const handleInputChange = (field: keyof Slot, value: string) => {
     const updatedSlot = { ...editedSlot, [field]: value };
     setEditedSlot(updatedSlot);
@@ -260,7 +258,7 @@ const SlotList = () => {
       "검색어": "검색어\n검색어를 입력해주세요. 검색 후 랜딩되는 페이지에 상품이 보이지 않으면 소재가 종료될 수 있어요.",
       "정답 태그 목록": "정답 태그 목록\n정답 태그 목록을 입력해주세요",
     };
-    
+
     const headerMapLanding: Record<string, string> = {
       '상점명': '상점명\n공백 포함 최대 10자까지 노출',
       '랜딩 URL': '랜딩 URL\n상품이 검색된 페이지 혹은 상품이 보이는 페이지를 세팅해주세요.',
@@ -275,7 +273,7 @@ const SlotList = () => {
       '상품 URL': '상품 URL\n상품 상세 페이지의 URL를 입력해주세요.',
     };
 
-    
+
     const headerMapLandingMulti: Record<string, string> = {
       '상점명': '상점명\n공백 포함 최대 10자까지 노출',
       '랜딩 URL': '랜딩 URL\n상품이 검색된 페이지 혹은 상품이 보이는 페이지를 세팅해주세요.',
@@ -294,10 +292,10 @@ const SlotList = () => {
 
     const convertSlotsToExcelData = (slots: Slot[], customMode: number = 0) => {
         const result: any[] = [];
-     
+
 
        slots.forEach((slot) => {
-        // const startDate = new Date( Math.min(new Date(slot.endDate).getTime() ,new Date().setHours(0, 0, 0, 0) +86400000));   // 하루 더하기 
+        // const startDate = new Date( Math.min(new Date(slot.endDate).getTime() ,new Date().setHours(0, 0, 0, 0) +86400000));   // 하루 더하기
 
           const slotStartDate =  new Date(
                                 Math.max(
@@ -336,7 +334,7 @@ const SlotList = () => {
           '아웃랜딩 여부' : 'Y',
           '목표 트래픽 수' : slot.extraTime == 1 ? 15:10,
         };
-        
+
         if ((!slot.secretKey1 && !slot.secretKey2 && !slot.secretKey3 && !slot.secretKey4) || ( customMode == 1 && slot.sortation  !=1 )) {
           const row: Record<string, any> = {
             ...baseRow,
@@ -380,7 +378,7 @@ const SlotList = () => {
             }
             result.push(orderedRow);
           }
-          
+
            if(slot.secretKey3){
             const row: Record<string, any> = {
               ...baseRow,
@@ -416,10 +414,10 @@ const SlotList = () => {
 
     const convertSlotsToExcelDataMulti = (slots: Slot[], customMode: number = 0) => {
         const result: any[] = [];
-     
+
 
        slots.forEach((slot) => {
-     
+
       const slotStartDate =  new Date(
                                 Math.max(
                                   Math.min(
@@ -503,7 +501,7 @@ const SlotList = () => {
             }
             result.push(orderedRow);
           }
-          
+
            if(slot.secretKey3){
             const row: Record<string, any> = {
               ...baseRow,
@@ -541,7 +539,7 @@ const SlotList = () => {
 
     const convertSlotsToExcelDataLanding = (slots: Slot[], customMode:number = 0) => {
         const result: any[] = [];
-    
+
         slots.forEach((slot) => {
 
                    const slotStartDate =  new Date(
@@ -584,7 +582,7 @@ const SlotList = () => {
           '정답 태그 목록': slot.answerTagList,
         };
 
-       
+
 
         if((!slot.secretLandingKey1 && !slot.secretLandingKey2 && !slot.secretLandingKey3  && !slot.secretLandingKey4  )|| (customMode ==1 && slot.sortation !=2)){
            const row: Record<string, any> = {
@@ -623,7 +621,7 @@ const SlotList = () => {
             }
             result.push(orderedRow);
           }
-          
+
            if(slot.secretLandingKey3){
             const row: Record<string, any> = {
               ...baseRow,
@@ -654,7 +652,7 @@ const SlotList = () => {
 
     const convertSlotsToExcelDataLandingMulti = (slots: Slot[], customMode:number = 0) => {
         const result: any[] = [];
-    
+
         slots.forEach((slot) => {
 
          const slotStartDate =  new Date(
@@ -736,7 +734,7 @@ const SlotList = () => {
             }
             result.push(orderedRow);
           }
-          
+
            if(slot.secretLandingKey3){
             const row: Record<string, any> = {
               ...baseRow,
@@ -770,7 +768,7 @@ const SlotList = () => {
     //     return date.toISOString().split('T')[0];
     // };
 
-        
+
 
     const formatDate = (dateStr: string | Date) => {
       const date = new Date(dateStr);
@@ -781,7 +779,7 @@ const SlotList = () => {
     };
 
 
-  
+
     const excelDownload= () => {
         if(Number(duration) ==0){
           alert("날짜를 입력해주세요");
@@ -992,12 +990,12 @@ const SlotList = () => {
                       return;
                     }
                   }
-                } 
-                
+                }
+
               }else{
                     alert("출력할 데이터가 없습니다.");
                     return;
-                  }  
+                  }
             }
 
             else if(result.value.selectedOption =="2") {// 랜딩
@@ -1010,7 +1008,7 @@ const SlotList = () => {
                   const multiSlots = targetLandingSlot.filter(
                     slot => slot.productLink !== null && slot.productLink.trim() !== ""
                   );
-        
+
                   const landingData = convertSlotsToExcelDataLanding(singleSlots);
                   const landingDataMulti = convertSlotsToExcelDataLandingMulti(multiSlots);
 
@@ -1089,7 +1087,7 @@ const SlotList = () => {
                     }
                   }
                   }
-                
+
                   if(result.value.isMulti){
                     if (multiSlots.length != 0) {
                         // ✅ 헤더에 \r\n 제거하고 \n 그대로 유지
@@ -1160,13 +1158,13 @@ const SlotList = () => {
                         alert("출력할 데이터가 없습니다.");
                         return;
                       }
-                    }  
+                    }
                   }
                 }else{
                     alert("출력할 데이터가 없습니다.");
                     return;
-                  }  
-             
+                  }
+
             }
           else if(result.value.selectedOption =="3") {// 사용자지정
 
@@ -1326,7 +1324,7 @@ const SlotList = () => {
                   XLSX.utils.book_append_sheet(keywordWorkbook, keywordWorkSheet, 'my_sheet');
                   XLSX.writeFile(keywordWorkbook, '슬롯_키워드_엑셀_원부.xlsx');
                   }
-                } 
+                }
               }
               if (targetLandingSlot.length != 0) {
 
@@ -1411,7 +1409,7 @@ const SlotList = () => {
                       XLSX.writeFile(landingWorkbook, '슬롯_랜딩_엑셀.xlsx');
                     }
                   }
-                
+
                   if(result.value.isMulti){
                     if (multiSlots.length != 0) {
                         // ✅ 헤더에 \r\n 제거하고 \n 그대로 유지
@@ -1477,7 +1475,7 @@ const SlotList = () => {
                         const landingWorkbook = XLSX.utils.book_new();
                         XLSX.utils.book_append_sheet(landingWorkbook, landingWorksheet, 'my_sheet');
                         XLSX.writeFile(landingWorkbook, '슬롯_랜딩_엑셀_원부.xlsx');
-                      }  
+                      }
                   }
                 }
             }
@@ -1486,7 +1484,7 @@ const SlotList = () => {
         });
 
 
-       
+
 
     };
 
@@ -1502,7 +1500,7 @@ const SlotList = () => {
         {/* 왼쪽: 검색창 */}
         <div className="flex items-center gap-2 w-[550px]">
          <button
-            className="bg-[#6449FC] text-white px-4 py-2 rounded hover:bg-[#5a3ee0] text-sm whitespace-nowrap"
+            className="bg-[#282828] text-white px-4 py-2 rounded hover:bg-[#141414] text-sm whitespace-nowrap"
             onClick={()=>{
               changeTime(2)
               setExtraTime(0)
@@ -1510,7 +1508,7 @@ const SlotList = () => {
             2배수
           </button>
           <button
-            className="bg-[#6449FC] text-white px-4 py-2 rounded hover:bg-[#5a3ee0] text-sm whitespace-nowrap"
+            className="bg-[#282828] text-white px-4 py-2 rounded hover:bg-[#141414] text-sm whitespace-nowrap"
             onClick={()=>{
               changeTime(3)
               setExtraTime(0)
@@ -1518,7 +1516,7 @@ const SlotList = () => {
             3배수
           </button>
           <button
-            className="bg-[#6449FC] text-white px-4 py-2 rounded hover:bg-[#5a3ee0] text-sm whitespace-nowrap"
+            className="bg-[#282828] text-white px-4 py-2 rounded hover:bg-[#141414] text-sm whitespace-nowrap"
             onClick={()=>{
               changeTime(4)
               setExtraTime(0);
@@ -1526,7 +1524,7 @@ const SlotList = () => {
             4배수
           </button>
           <button
-            className="bg-[#6449FC] text-white px-4 py-2 rounded hover:bg-[#5a3ee0] text-sm whitespace-nowrap"
+            className="bg-[#282828] text-white px-4 py-2 rounded hover:bg-[#141414] text-sm whitespace-nowrap"
             onClick={()=>{
               changeTime(4,2)
               setExtraTime(1);
@@ -1557,14 +1555,14 @@ const SlotList = () => {
             />
             <button
               onClick={() => changeTime(Number(inputValue))}
-              className="bg-[#6449FC] text-white px-4 py-2 rounded hover:bg-[#5a3ee0] text-sm whitespace-nowrap"
+              className="bg-[#282828] text-white px-4 py-2 rounded hover:bg-[#141414] text-sm whitespace-nowrap"
             >
               확인
             </button>
           </div> */}
-                  
+
           <button
-            className="bg-[#6449FC] text-white px-4 py-2 rounded hover:bg-[#5a3ee0] text-sm whitespace-nowrap"
+            className="bg-[#282828] text-white px-4 py-2 rounded hover:bg-[#141414] text-sm whitespace-nowrap"
             onClick={excelDownload}
           >
             엑셀 다운로드
@@ -1609,7 +1607,7 @@ const SlotList = () => {
               }
             }}
             dateFormat="yyyy-MM-dd"
-            className="border px-1 py-1 rounded text-lg font-semibold text-[#6449FC] w-[150px]"
+            className="border px-1 py-1 rounded text-lg font-semibold text-[#282828] w-[150px]"
             locale={ko}
           />
           <ReactDatePicker
@@ -1626,7 +1624,7 @@ const SlotList = () => {
               }
             }}
             dateFormat="yyyy-MM-dd"
-            className="border px-1 py-1 rounded text-lg font-semibold text-[#6449FC] w-[150px]"
+            className="border px-1 py-1 rounded text-lg font-semibold text-[#282828] w-[150px]"
             locale={ko}
           />
         </div>
@@ -1693,7 +1691,7 @@ const SlotList = () => {
                         key={slot.seq}
                         className="hover:bg-gray-100 transition-colors duration-200"
                       >
-                        
+
                         <td className="p-3 border-b border-gray-200">
                           {slot.seq}
                         </td>
@@ -2020,7 +2018,7 @@ const SlotList = () => {
                 key={p}
                 variant={p === page ? 'default' : 'ghost'}
                 onClick={() => setPage(p)}
-                className={`px-3 py-1 text-sm hover:bg-[#5a3ee0] ${p === page ? 'bg-[#6449FC] text-white' : 'text-gray-600 hover:text-white'}`}
+                className={`px-3 py-1 text-sm hover:bg-[#141414] ${p === page ? 'bg-[#282828] text-white' : 'text-gray-600 hover:text-white'}`}
               >
                 {p}
               </Button>

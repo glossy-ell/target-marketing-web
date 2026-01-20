@@ -1,13 +1,12 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import SlotRankingModal from '@/components/modals/SlotRankingModal';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import { useRouter } from 'next/navigation';
 
 interface Extend {
   extendDay: number;
@@ -106,7 +105,7 @@ const ExtendList = () => {
   const [isInitialOpen, setIsInitialOpen] = useState(false);
 
   const [targetExtendList,setTargetExtendList] = useState<Extend[]>([]); //키워드
-  
+
   const router = useRouter();
 
 
@@ -128,11 +127,11 @@ const ExtendList = () => {
         if (!res.ok) throw new Error('로그인 정보 확인 실패');
         const user = await res.json();
         setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow), additionalRegAllow:  Number(user.additionalRegAllow)});
-        
+
         if (user.role != 0) {
           router.replace('slot-management');
         }
-          
+
       } catch (err) {
         setError('로그인 정보가 없습니다.');
       }
@@ -186,10 +185,10 @@ const ExtendList = () => {
 
 
       const response = await fetch(`/api/extend?${params}`);
-  
+
       if (response.status === 401) {
         window.location.href = '/';
-        return; 
+        return;
       }
 
       if (!response.ok) throw new Error('데이터를 불러오는데 실패했습니다.');
@@ -213,12 +212,12 @@ const ExtendList = () => {
   useEffect(() => {
     if(!currentUser || currentUser.role != 0)
       return;
-   
+
     fetchExtends();
   }, [search, page, itemsPerPage,currentUser]);
 
 
- 
+
   const handleSearch = () => {
     const trimmed = inputValue.trim();
     if (trimmed !== search) {
@@ -303,7 +302,7 @@ const ExtendList = () => {
 
       if (res.status === 401) {
         window.location.href = '/';
-        return; 
+        return;
       }
 
       if (!res.ok) {
@@ -314,7 +313,7 @@ const ExtendList = () => {
         icon: 'success',
         title: '연장되었습니다.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
 
       // 저장 성공 시 처리
@@ -341,7 +340,7 @@ const ExtendList = () => {
         confirmButtonText: '연장',
         cancelButtonText: '취소',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
         cancelButtonColor: '#555',
       });
 
@@ -355,19 +354,19 @@ const ExtendList = () => {
 
         if (res.status === 401) {
           window.location.href = '/';
-          return; 
+          return;
         }
 
         if (!res.ok) {
           throw new Error('연장 실패');
         }
 
-        
+
         await MySwal.fire({
           icon: 'success',
           title: '연장되었습니다.',
           color: '#000',
-          confirmButtonColor: '#6449FC',
+          confirmButtonColor: '#282828',
         });
 
         // 저장 성공 시 처리
@@ -396,11 +395,11 @@ const ExtendList = () => {
       confirmButtonText: '거절',
       cancelButtonText: '취소',
       color: '#000',
-      confirmButtonColor: '#6449FC',
+      confirmButtonColor: '#282828',
       cancelButtonColor: '#555',
     });
 
-    
+
     if (!result.isConfirmed) return;
 
     try {
@@ -409,10 +408,10 @@ const ExtendList = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ seq: seq }),
       });
-      
+
       if (res.status === 401) {
         window.location.href = '/';
-        return; 
+        return;
       }
 
       if (!res.ok) throw new Error('연장 거절 실패');
@@ -426,7 +425,7 @@ const ExtendList = () => {
         icon: 'success',
         title: '연장 요청이 거절되었습니다.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
     } catch (error) {
       console.error(error);
@@ -434,7 +433,7 @@ const ExtendList = () => {
         icon: 'error',
         title: '연장거절 중 오류가 발생했습니다.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
     }finally {
       confirming.current =null;
@@ -453,7 +452,7 @@ const ExtendList = () => {
           icon: 'warning',
           title: '연장 거절할 슬롯을 선택하세요.',
           color: '#000',
-          confirmButtonColor: '#6449FC',
+          confirmButtonColor: '#282828',
         });
         return;
       }
@@ -465,7 +464,7 @@ const ExtendList = () => {
         confirmButtonText: '연장',
         cancelButtonText: '취소',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
         cancelButtonColor: '#555',
       });
 
@@ -486,7 +485,7 @@ const ExtendList = () => {
           icon: 'success',
           title: '연장 요청이 거절되었습니다.',
           color: '#000',
-          confirmButtonColor: '#6449FC',
+          confirmButtonColor: '#282828',
         });
       }
     }catch (error) {
@@ -495,7 +494,7 @@ const ExtendList = () => {
         icon: 'error',
         title: '연장거절 중 오류가 발생했습니다.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
     }finally {
       confirming.current =null;
@@ -526,7 +525,7 @@ const ExtendList = () => {
           <input
             type="text"
             placeholder="아이디, 키워드, 상품명, 프로덕트, 벤더"
-            className="bg-white text-black border text-xs border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6449FC] w-full"
+            className="bg-white text-black border text-xs border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#282828] w-full"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => {
@@ -562,7 +561,7 @@ const ExtendList = () => {
             거절
           </button>
           <button
-            className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-3 py-2 rounded text-sm"
+            className="bg-[#282828] hover:bg-[#141414] text-white px-3 py-2 rounded text-sm"
             onClick={handleConfirmAll}
           >
             승인
@@ -636,7 +635,7 @@ const ExtendList = () => {
                             checked={selectedIds.includes(extend.seq)}
                             onChange={() => handleCheckboxChange(extend.seq)}
                           />
-                        </td>  
+                        </td>
                         <td className="p-3 border-b border-gray-200">
                           {extend.seq}
                         </td>
@@ -661,11 +660,11 @@ const ExtendList = () => {
 
                         {/* {isEditing ? (
                             <td className="p-3 border-b border-gray-200 max-w-xs break-words">
-                              <select name="" 
+                              <select name=""
                                 value={editedSlot.sortation || ''}
                                onChange={(e) =>
                                 handleSortationChange('sortation', e.target.value)
-                              } 
+                              }
                               id="sortation"
                               >
                                 <option value="0">구분 선택</option>
@@ -684,7 +683,7 @@ const ExtendList = () => {
                               </span>
                             </td>
                           )} */}
-                    
+
                         {/* <td className="p-3 border-b border-gray-200 max-w-xs break-words">
                           <div className="flex items-center gap-2">
                             <div
@@ -706,7 +705,7 @@ const ExtendList = () => {
                                   ? ''
                                   : 'none'
                               }}
-                              className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-3 py-1 rounded-md"
+                              className="bg-[#282828] hover:bg-[#141414] text-white px-3 py-1 rounded-md"
                               onClick={() => {
                                 setSelectedModalSlot(slot);
                                 setAdditionalModalOpen(true);
@@ -715,7 +714,7 @@ const ExtendList = () => {
                               추가등록
                           </Button>
                         </td> */}
-                        
+
                         <td className="p-3 border-b border-gray-200 max-w-xs break-words">
                           {extend.userId}
                         </td>
@@ -786,7 +785,7 @@ const ExtendList = () => {
 
 
                         <td className="p-3 border-b border-gray-200">
-                          {formatDate(extend.startDate)} 
+                          {formatDate(extend.startDate)}
                         </td>
                         <td className="p-3 border-b border-gray-200">
                           {formatDate(extend.endDate)}
@@ -821,7 +820,7 @@ const ExtendList = () => {
                         <td className="p-3 border-b border-gray-200 space-x-2 whitespace-nowrap">
                             <>
                               <Button
-                                className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-3 py-1 rounded-md"
+                                className="bg-[#282828] hover:bg-[#141414] text-white px-3 py-1 rounded-md"
                                 onClick={() => handleConfirm(extend.seq)}
                               >
                                 승인
@@ -839,7 +838,7 @@ const ExtendList = () => {
                   })}
                 </tbody>
               </table>
-            </div>  
+            </div>
           )}
 
           <div className="mt-8 flex justify-center items-center gap-2 flex-wrap">
@@ -850,7 +849,7 @@ const ExtendList = () => {
                 key={p}
                 variant={p === page ? 'default' : 'ghost'}
                 onClick={() => setPage(p)}
-                className={`px-3 py-1 text-sm hover:bg-[#5a3ee0] ${p === page ? 'bg-[#6449FC] text-white' : 'text-gray-600 hover:text-white'}`}
+                className={`px-3 py-1 text-sm hover:bg-[#141414] ${p === page ? 'bg-[#282828] text-white' : 'text-gray-600 hover:text-white'}`}
               >
                 {p}
               </Button>

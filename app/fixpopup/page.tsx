@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function FixPopupPage() {
   const [formData, setFormData] = useState({
@@ -42,18 +42,18 @@ export default function FixPopupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-    
+
       if (!res.ok) {
          if(res.status===401){
           alert('세션이 만료되었습니다. 다시 로그인해주세요.');
           return;
         }
-      
+
         else{
            throw new Error('저장 실패');
         }
       }
-      
+
       alert('저장되었습니다.');
       if (window.opener && !window.opener.closed) {
         window.opener.location.reload();  // 부모 창 새로고침
@@ -190,7 +190,7 @@ export default function FixPopupPage() {
         </button>
         <button
           onClick={handleSubmit}
-          className="bg-[#6449FC] hover:bg-[#5a3ee0]  text-white px-4 py-2 rounded"
+          className="bg-[#282828] hover:bg-[#141414]  text-white px-4 py-2 rounded"
         >
           저장
         </button>

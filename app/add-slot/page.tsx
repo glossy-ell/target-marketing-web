@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import PageHeader from '../components/common/PageHeader';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import ReactDatePicker from "react-datepicker";
 import { ko } from 'date-fns/locale';
-import { addMonths } from "date-fns";
+import { useEffect, useRef, useState } from 'react';
+import ReactDatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import PageHeader from '../components/common/PageHeader';
 
 interface User {
   seq: number;
@@ -41,7 +39,7 @@ export default function AddSlot() {
           edit_end_time: timeObj.edit_end_time,
         });
 
-        
+
         fetch('/api/weekend')
           .then(res => res.json())
           .then(data => {
@@ -64,7 +62,7 @@ export default function AddSlot() {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  }).replace(/\. /g, '-').replace(/\.$/, ''); 
+  }).replace(/\. /g, '-').replace(/\.$/, '');
 
   // const getStartAndEndDate = (duration: number) => {
   //   const now = new Date();
@@ -95,11 +93,11 @@ export default function AddSlot() {
 
  const getStartAndEndDate = (duration: number) => {
      const start = new Date();
- 
+
 
      start.setDate(start.getDate() + 1);
      const end = new Date(start);
-     
+
      end.setDate(start.getDate() + (duration - 1));
      return {
        startDate: formatDate(start),
@@ -165,8 +163,8 @@ export default function AddSlot() {
 
         const data: User[] = await response.json();
 
-        let filtered = data;
-   
+        const filtered = data;
+
         setUsers(filtered);
       } catch (err) {
         console.error('사용자 목록 로드 실패:', err);
@@ -240,7 +238,7 @@ export default function AddSlot() {
 
       if (response.status === 401) {
         window.location.href = '/';
-        return; 
+        return;
       }
       if (!response.ok) throw new Error('슬롯 추가 실패');
 
@@ -332,7 +330,7 @@ export default function AddSlot() {
             }
           }}
         />
-        
+
         <label className="block mb-2 font-medium">상품명 추가</label>
         <input
           type="number"
@@ -364,13 +362,13 @@ export default function AddSlot() {
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setDuration(7)}
-            className="flex-1 px-4 py-1 bg-[#6449FC] text-white rounded hover:bg-[#5a3ee0] transition"
+            className="flex-1 px-4 py-1 bg-[#282828] text-white rounded hover:bg-[#141414] transition"
           >
             7일
           </button>
           <button
             onClick={() => setDuration(10)}
-            className="flex-1 px-4 py-1 bg-[#6449FC] text-white rounded hover:bg-[#5a3ee0] transition"
+            className="flex-1 px-4 py-1 bg-[#282828] text-white rounded hover:bg-[#141414] transition"
           >
             10일
           </button>
@@ -409,14 +407,14 @@ export default function AddSlot() {
                     }
                   }}
                   dateFormat="yyyy-MM-dd"
-                  className="border px-1 py-1 rounded text-lg font-semibold text-[#6449FC] w-[150px]"
+                  className="border px-1 py-1 rounded text-lg font-semibold text-[#282828] w-[150px]"
                   locale={ko}
                 />
             </div>
             <div className="text-gray-400 text-xl px-2">→</div>
             <div className="text-gray-600 text-right">
               <div className="text-sm">작업 종료일</div>
-              <div className="text-lg font-semibold text-[#6449FC]">{endDate}</div>
+              <div className="text-lg font-semibold text-[#282828]">{endDate}</div>
             </div>
           </div>
         </div>
@@ -424,7 +422,7 @@ export default function AddSlot() {
 
         <button
           onClick={handleSubmit}
-          className="w-full p-3 bg-[#6449FC] text-white font-medium rounded-lg hover:bg-[#5a3ee0] transition"
+          className="w-full p-3 bg-[#282828] text-white font-medium rounded-lg hover:bg-[#141414] transition"
         >
           슬롯 추가
         </button>

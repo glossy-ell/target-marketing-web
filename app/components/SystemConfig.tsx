@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
 import { LocalizationProvider, TimeField } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import React, { useState } from 'react';
 
 type ConfigData = {
   openStartTime: string;
@@ -29,13 +29,13 @@ export default function SystemConfig({ weekendOpen,setWeekendOpen,configData, se
         setIsOpen((prev) => !prev);
       }
     }}>
-    
+
 
           <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsOpen((prev) => !prev)}>
             <h4 className="font-bold mb-2">📅 시스템 설정</h4>
             <span className="text-xl">{isOpen ? "▲" : "▼"}</span>
           </div>
-   
+
       {/* 접히는 본문 */}
       {isOpen && (
         <div className='cursor-default'>
@@ -72,7 +72,7 @@ export default function SystemConfig({ weekendOpen,setWeekendOpen,configData, se
               <TimeField
                 ampm={false}
                 format="HH:mm"
-                sx={{ width: 70, fontSize: '0.875rem' }} 
+                sx={{ width: 70, fontSize: '0.875rem' }}
                  value={configData.openEndTime ? new Date(`2000-01-01T${configData.openEndTime}`) : new Date('2000-01-01T00:00')}
                 onChange={(newValue) => {
                 const time = newValue
@@ -97,7 +97,7 @@ export default function SystemConfig({ weekendOpen,setWeekendOpen,configData, se
               <TimeField
                 ampm={false}
                 format="HH:mm"
-                sx={{ width: 70, fontSize: '0.875rem' }} 
+                sx={{ width: 70, fontSize: '0.875rem' }}
                  value={configData.editStartTime ? new Date(`2000-01-01T${configData.editStartTime}`) : new Date('2000-01-01T00:00')}
                 onChange={(newValue) => {
                 const time = newValue
@@ -121,7 +121,7 @@ export default function SystemConfig({ weekendOpen,setWeekendOpen,configData, se
               <TimeField
                 ampm={false}
                 format="HH:mm"
-                sx={{ width: 70, fontSize: '0.875rem' }} 
+                sx={{ width: 70, fontSize: '0.875rem' }}
                  value={configData.editEndTime ? new Date(`2000-01-01T${configData.editEndTime}`) : new Date('2000-01-01T00:00')}
                 onChange={(newValue) => {
                 const time = newValue
@@ -151,17 +151,17 @@ export default function SystemConfig({ weekendOpen,setWeekendOpen,configData, se
                     setWeekendOpen(e.target.checked);
                 }}
               />
-              <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#6449FC] transition-colors duration-200"></div>
+              <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#282828] transition-colors duration-200"></div>
               <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 peer-checked:translate-x-5"></div>
             </label>
             </div>
         </div>
-      
+
 
         <div className="mt-4 text-right">
           <button
             onClick={saveConfig}
-            className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-4 py-2 rounded"
+            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded"
           >
             설정 저장
           </button>

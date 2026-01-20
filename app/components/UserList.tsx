@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import SystemConfig from './SystemConfig';
+import { useEffect, useRef, useState } from "react";
 import AgencyConfig from './AgencyConfig';
-import UserConfig from './UserConfig';
 import DistributorConfig from './DistributorConfig';
+import SystemConfig from './SystemConfig';
+import UserConfig from './UserConfig';
 
 interface User {
   seq: number;
@@ -68,9 +68,9 @@ const UserList = () => {
     editEndTime: '',
   });
 
-  
+
   const [weekendOpen, setWeekendOpen] = useState<boolean>(false);
-  
+
 
   useEffect(() => {
     fetch('/api/config')
@@ -105,7 +105,7 @@ const UserList = () => {
       });
       if (res.status === 401) {
         window.location.href = '/';
-        return; 
+        return;
       }
 
       const res2 = await fetch('/api/weekend', {
@@ -115,7 +115,7 @@ const UserList = () => {
       });
       if (res2.status === 401) {
         window.location.href = '/';
-        return; 
+        return;
       }
 
       if (res.ok && res2.ok) {
@@ -201,7 +201,7 @@ const UserList = () => {
         const res = await fetch('/api/users');
         if (res.status === 401) {
           window.location.href = '/';
-          return; 
+          return;
         }
         if (!res.ok) throw new Error('유저 목록 불러오기 실패');
         const data = await res.json();
@@ -228,7 +228,7 @@ const UserList = () => {
       .then((data) => setDistributorList(data));
   }, []);
 
-  
+
  useEffect(() => {
     // 대행사 목록 불러오기
     if(formData.distributorSeq != '' && !isNaN(Number(formData.distributorSeq))){
@@ -242,7 +242,7 @@ const UserList = () => {
 
     }
 
-   
+
   }, [formData.distributorSeq]);
 
     useEffect(() => {
@@ -307,7 +307,7 @@ const UserList = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     // @ts-ignore
     const { name, value,checked} = e.target; //경고 무시
-    
+
     if (name === 'excelAllow') {
       setFormData((prev) => ({ ...prev, excelAllow: checked ? 1 : 0 }));
       return; // 기존 로직 실행 안 하도록 종료
@@ -349,7 +349,7 @@ const UserList = () => {
         });
         if (res.status === 401) {
           window.location.href = '/';
-          return; 
+          return;
         }
 
         if (!res.ok) {
@@ -391,7 +391,7 @@ const UserList = () => {
         });
         if (res.status === 401) {
           window.location.href = '/';
-          return; 
+          return;
         }
 
         if (!res.ok) {
@@ -495,7 +495,7 @@ const UserList = () => {
             onChange={handleInputChange}
             className="border p-2"
           />
-        
+
           <input
             type="number"
             name="price"
@@ -636,7 +636,7 @@ const UserList = () => {
                   name="excelAllow"
                   checked={formData.excelAllow === 1}
                   onChange={handleInputChange}
-                  className="border p-2 cursor-pointer accent-[#6449FC]"
+                  className="border p-2 cursor-pointer accent-[#282828]"
                 />
               </label>
             ):null}
@@ -649,7 +649,7 @@ const UserList = () => {
                   name="additionalRegAllow"
                   checked={formData.additionalRegAllow ===1 }
                   onChange={handleInputChange}
-                  className="border p-2 cursor-pointer accent-[#6449FC]"
+                  className="border p-2 cursor-pointer accent-[#282828]"
                 />
               </label>
             ):null}
@@ -662,23 +662,23 @@ const UserList = () => {
                   name="rankingCheckAllow"
                   checked={formData.rankingCheckAllow ===1 }
                   onChange={handleInputChange}
-                  className="border p-2 cursor-pointer accent-[#6449FC]"
+                  className="border p-2 cursor-pointer accent-[#282828]"
                 />
               </label>
             ):null}
 
-      
+
             {currentUser?.role === 0 ? (
               <label  className="inline-flex gap-1 cursor-pointer"
                style={{ display: (currentUser?.role === 0 && formData.role !=3 )  ? '' : 'none' }}>
-                
+
               <span>슬롯 오픈 허용</span>
               <input
                 type="checkbox"
                 name="slotAllow"
                 checked={formData.slotAllow ===1 }
                 onChange={handleInputChange}
-                className="border p-2 cursor-pointer accent-[#6449FC]"
+                className="border p-2 cursor-pointer accent-[#282828]"
               />
               </label>
             ):null}
@@ -687,17 +687,17 @@ const UserList = () => {
               <label   className="inline-flex gap-1 cursor-pointer"  style={{ display: (currentUser?.role === 0 && formData.role !=3 )   ? '' : 'none' }}  >
               <span>사용자 추가 허용 </span>
               <input
-             
+
                 type="checkbox"
                 name="userAllow"
                 checked={formData.userAllow ==1 }
                 onChange={handleInputChange}
-                className="border p-2 cursor-pointer accent-[#6449FC]"
+                className="border p-2 cursor-pointer accent-[#282828]"
               />
               </label>
             ):null}
 
-            
+
           </div>
         </div>
            <div>
@@ -709,7 +709,7 @@ const UserList = () => {
         <div className="mt-4">
           <button
             onClick={handleSubmit}
-            className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-4 py-2 rounded"
+            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded"
           >
             {formMode === 'create' ? '등록' : '수정'}
           </button>
@@ -818,18 +818,18 @@ const UserList = () => {
                     </span>
                   )}
                   {user.rankingCheckAllow==true && (
-                    <span className="bg-[#6449FC] text-white text-sm px-3 py-1 rounded-full">
+                    <span className="bg-[#282828] text-white text-sm px-3 py-1 rounded-full">
                       순위체크
                     </span>
                   )}
                 </td>
                 <td className="border p-2">
-                  <button style={{ display: (currentUser!.role == 0 || currentUser!.role == 1) ? '' : 'none' }} onClick={() => handleEditClick(user)} className="text-[#6449FC] underline text-sm" >
+                  <button style={{ display: (currentUser!.role == 0 || currentUser!.role == 1) ? '' : 'none' }} onClick={() => handleEditClick(user)} className="text-[#282828] underline text-sm" >
                     수정
                   </button>
                 </td>
                   <td className="border p-2">
-                  <button style={{ display: (currentUser!.seq == user.seq ) ? 'none' : '' }} onClick={() => handleDeleteClick(user.seq)} className="text-[#6449FC] underline text-sm" >
+                  <button style={{ display: (currentUser!.seq == user.seq ) ? 'none' : '' }} onClick={() => handleDeleteClick(user.seq)} className="text-[#282828] underline text-sm" >
                     삭제
                   </button>
                 </td>
@@ -849,7 +849,7 @@ const UserList = () => {
               key={p}
               variant={p === page ? 'default' : 'ghost'}
               onClick={() => setPage(p)}
-              className={`px-3 py-1 text-sm hover:bg-[#5a3ee0] ${p === page ? 'bg-[#6449FC] text-white' : 'text-gray-600 hover:text-white'}`}
+              className={`px-3 py-1 text-sm hover:bg-[#141414] ${p === page ? 'bg-[#282828] text-white' : 'text-gray-600 hover:text-white'}`}
             >
               {p}
             </Button>

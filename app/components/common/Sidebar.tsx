@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { FiLogOut, FiUser } from 'react-icons/fi';
 
 export default function Sidebar() {
@@ -86,7 +86,7 @@ export default function Sidebar() {
               href="/slot-management"
               className={`px-4 py-3 rounded transition-all ${
                 isActive('/slot-management')
-                  ? 'bg-[#6449FC] text-white font-semibold shadow-md'
+                  ? 'bg-[#282828] text-white font-semibold shadow-md'
                   : 'hover:bg-gray-200'
               }`}
             >
@@ -98,7 +98,7 @@ export default function Sidebar() {
                 href="/add-slot"
                 className={`px-4 py-3 rounded transition-all ${
                   isActive('/add-slot')
-                    ? 'bg-[#6449FC] text-white font-semibold shadow-md'
+                    ? 'bg-[#282828] text-white font-semibold shadow-md'
                     : 'hover:bg-gray-200'
                 }`}
               >
@@ -112,7 +112,7 @@ export default function Sidebar() {
                 href="/user-management"
                 className={`px-4 py-3 rounded transition-all ${
                   isActive('/user-management')
-                    ? 'bg-[#6449FC] text-white font-semibold shadow-md'
+                    ? 'bg-[#282828] text-white font-semibold shadow-md'
                     : 'hover:bg-gray-200'
                 }`}
               >
@@ -125,7 +125,7 @@ export default function Sidebar() {
                 href="/extend-management"
                 className={`px-4 py-3 rounded transition-all ${
                   isActive('/extend-management')
-                    ? 'bg-[#6449FC] text-white font-semibold shadow-md'
+                    ? 'bg-[#282828] text-white font-semibold shadow-md'
                     : 'hover:bg-gray-200'
                 }`}
               >
@@ -139,7 +139,7 @@ export default function Sidebar() {
                 href="/log"
                 className={`px-4 py-3 rounded transition-all ${
                   isActive('/log')
-                    ? 'bg-[#6449FC] text-white font-semibold shadow-md'
+                    ? 'bg-[#282828] text-white font-semibold shadow-md'
                     : 'hover:bg-gray-200'
                 }`}
               >

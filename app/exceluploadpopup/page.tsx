@@ -1,6 +1,5 @@
 'use client';
 
-import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx-js-style';
@@ -75,7 +74,7 @@ interface Slot {
       "검색어": "검색어\n검색어를 입력해주세요. 검색 후 랜딩되는 페이지에 상품이 보이지 않으면 소재가 종료될 수 있어요.",
       "정답 태그 목록": "정답 태그 목록\n정답 태그 목록을 입력해주세요",
     };
-    
+
     const headerMapLanding: Record<string, string> = {
       "슬롯번호": "슬롯번호",
       '상점명': '상점명\n공백 포함 최대 10자까지 노출',
@@ -91,7 +90,7 @@ interface Slot {
       '상품 URL': '상품 URL\n상품 상세 페이지의 URL를 입력해주세요.',
     };
 
-    
+
     const headerMapLandingMulti: Record<string, string> = {
       "슬롯번호": "슬롯번호",
       '상점명': '상점명\n공백 포함 최대 10자까지 노출',
@@ -133,7 +132,7 @@ export default function ExcelUploadPopupPage() {
                     </div>
                   </div>
                 `,
-    
+
               showCancelButton: true,
               confirmButtonText: '확인',
               cancelButtonText: '취소',
@@ -143,11 +142,11 @@ export default function ExcelUploadPopupPage() {
                       Swal.showValidationMessage('옵션을 선택해주세요.');
                       return;
                     }
-                 
-   
+
+
                   return {
                      selectedOption: selected.value,
-            
+
                   };
               }
             }).then((result) => { // 확인시
@@ -200,7 +199,7 @@ export default function ExcelUploadPopupPage() {
                     XLSX.writeFile(workbook, '슬롯_엑셀_양식_키워드_원부.xlsx');
                   }
                 }else if(result.value.selectedOption=="3"){
-                 
+
                     const headers = Object.entries(headerMapLanding);
                     const sheetData = [headers.map(([_, desc]) => desc)];
 
@@ -221,7 +220,7 @@ export default function ExcelUploadPopupPage() {
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, sheet, '엑셀양식');
                     XLSX.writeFile(workbook, '슬롯_엑셀_양식_랜딩_단일.xlsx');
-                  
+
                 }else if(result.value.selectedOption=="4"){
                   const headers = Object.entries(headerMapLandingMulti);
                   const sheetData = [headers.map(([_, desc]) => desc)];
@@ -301,13 +300,13 @@ export default function ExcelUploadPopupPage() {
     const comparePriceSalePlaceCount = row[headerMapKeyword["가격 비교 판매처 수"]];
     const productPrice = row[headerMapKeyword["상품 가격"]];
     const thumbnail = row[headerMapKeyword["상품 이미지 URL"]];
-    
+
 
 
     let seq = -1;
     const brandPayload: any = {
         slotSeq: slotSeq,
-        
+
         keyword: keyword,
         landingUrl: landingUrl,
         startDate: startDate,
@@ -333,17 +332,17 @@ export default function ExcelUploadPopupPage() {
 
       if(data.length ==0){
         alert("일치하는 슬롯이 없습니다.");
-        return; 
+        return;
       }else{
         seq = data[0].seq;
       }
-        
+
     } catch (err) {
       console.error('에러 발생:', err);
     }
 
 
-   
+
     // 각 항목을 필요에 따라 변환
     const updatePayload: any = {
     };
@@ -372,7 +371,7 @@ export default function ExcelUploadPopupPage() {
         body: JSON.stringify(updatePayload),
       });
 
-      alert("성공적으로 수정하였습니다.");   
+      alert("성공적으로 수정하였습니다.");
       if (window.opener) {
         window.opener.location.reload(); // 부모 창 새로고침
       }
@@ -390,7 +389,7 @@ export default function ExcelUploadPopupPage() {
     <div className="min-h-screen items-center bg-white p-6 text-left">
       <h1 className="text-2xl font-bold mb-6 text-center">엑셀 업로드</h1>
       <button
-        className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-6 py-3 rounded text-lg mr-2"
+        className="bg-[#282828] hover:bg-[#141414] text-white px-6 py-3 rounded text-lg mr-2"
         onClick={downloadExcelTemplate}
       >
         엑셀 양식 다운로드
@@ -441,7 +440,7 @@ export default function ExcelUploadPopupPage() {
             </table>
             <div className="flex flex-col">
               <button
-                className="inline-block self-start bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-6 py-3 rounded text-lg mr-2  mb-2"
+                className="inline-block self-start bg-[#282828] hover:bg-[#141414] text-white px-6 py-3 rounded text-lg mr-2  mb-2"
                 onClick={async () => {
                   await handleApplyExcelData(uploadedData);
                 }}

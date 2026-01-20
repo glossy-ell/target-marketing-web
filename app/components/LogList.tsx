@@ -1,16 +1,16 @@
 'use client';
 
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import ReactDatePicker from "react-datepicker";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
-import 'react-datepicker/dist/react-datepicker.css';
+import axios from "axios";
+import { addMonths } from "date-fns";
 import { ko } from 'date-fns/locale';
-import { format, toDate, addMonths } from "date-fns";
-import axios, { AxiosError, isAxiosError } from "axios";
+import 'react-datepicker/dist/react-datepicker.css';
 import * as XLSX from 'xlsx-js-style';
 
 interface Props {
@@ -21,7 +21,7 @@ interface Props {
   setTotalCancelCount: (count: number) => void;
   setTotalSettleCount: (count: number) => void;
 
-  
+
   searchTotalIssued: boolean;
   searchTotalRefund: boolean;
   searchTotalCancel: boolean;
@@ -191,7 +191,7 @@ const LogList = ({
 
       setLogs(data);
       setTotalPages(totalPages);
-      
+
 
       setTotalCount(totalCount);
       setTotalIssuedCount(totalIssuedCount);
@@ -199,7 +199,7 @@ const LogList = ({
       setTotalCancelCount(totalCancelCount);
       setTotalSettleCount(totalSettlement);
 
-   
+
 
 
       if(isAdmin ){
@@ -260,7 +260,7 @@ const LogList = ({
         const res = await fetch('/api/users');
         if (res.status === 401) {
           window.location.href = '/';
-          return; 
+          return;
         }
 
         if (!res.ok) throw new Error('유저 목록 불러오기 실패');
@@ -275,7 +275,7 @@ const LogList = ({
     fetchUsers();
   }, []);
 
-  
+
   useEffect(() => {
     if(!currentUser)
       return;
@@ -338,7 +338,7 @@ const LogList = ({
 
     if(searchTotalIssued){
       formData.append("searchTotalIssued", String(1));
-    } 
+    }
     if(searchTotalRefund){
       formData.append("searchTotalRefund", String(1));
     }
@@ -357,10 +357,10 @@ const LogList = ({
           'Cache-Control': 'no-store', // 캐시를 완전히 사용하지 않도록 설정
         },
       });
-      
+
       setLogs(response.data.data);
 
-      
+
       // setTotalIssuedCount(response.data.totalIssuedCount);
       // setTotalRefundCount(response.data.totalRefundCount);
       // setTotalCancelCount(response.data.totalCancelCount);
@@ -385,7 +385,7 @@ const LogList = ({
           setError(error instanceof Error ? error.message : '세션 만료');
           setLogs([]);
           window.location.href = '/';
-        } 
+        }
         else if (error.response?.status === 415) {
           setError(error instanceof Error ? error.message : '알 수 없는 오류');
           setLogs([]);
@@ -407,7 +407,7 @@ const LogList = ({
    async function commSearchAll() { // 엑셀 로그용 전체 로그 다운로드
 
     var formData = new FormData();
- 
+
     formData.append("pageCount", "-1");
     formData.append("logType", String(logType));
 
@@ -445,10 +445,10 @@ const LogList = ({
         slotEndDate.toLocaleDateString("ko-KR", { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '-').replace('.', '')
       );
 
- 
+
     if(searchTotalIssued){
       formData.append("searchTotalIssued", String(1));
-    } 
+    }
     if(searchTotalRefund){
       formData.append("searchTotalRefund", String(1));
     }
@@ -465,7 +465,7 @@ const LogList = ({
           'Cache-Control': 'no-store', // 캐시를 완전히 사용하지 않도록 설정
         },
       });
-      
+
       return response.data.data;
 
     } catch (error) {
@@ -473,7 +473,7 @@ const LogList = ({
         if (error.response?.status === 401) {
           setError(error instanceof Error ? error.message : '세션 만료');
           window.location.href = '/';
-        } 
+        }
         else if (error.response?.status === 415) {
           setError(error instanceof Error ? error.message : '알 수 없는 오류');
           return [];
@@ -508,7 +508,7 @@ const LogList = ({
       "시작일": "시작일",
       "종료일": "종료일",
     };
-    
+
      const convertLogsToExcelData = (logs : Log[]) => {
       const result: any[] = [];
        logs.forEach((log) => {
@@ -534,7 +534,7 @@ const LogList = ({
           '정산가' : log.adjustmentPrice,
           "환불가": log.refundPrice,
           '시작일': log.startAt.slice(0, 10),
-          '종료일': log.endAt.slice(0, 10),    
+          '종료일': log.endAt.slice(0, 10),
         };
         result.push(baseRow);
       });
@@ -623,7 +623,7 @@ const LogList = ({
         return;
       }
     };
-  
+
 
 
   //검색 초기화
@@ -802,7 +802,7 @@ const LogList = ({
             <div className="flex gap-2">
               <button
                 onClick={() => commSearch()}
-                className="border border-gray-400 px-4 py-2 rounded text-white text-sm bg-[#6449FC] hover:bg-[#5a3ee0]"
+                className="border border-gray-400 px-4 py-2 rounded text-white text-sm bg-[#282828] hover:bg-[#141414]"
               >
                 검색
               </button>
@@ -814,7 +814,7 @@ const LogList = ({
               </button>
                 <button
                 onClick={() => logExcelDownload()}
-                className="border border-gray-400 px-4 py-2 rounded text-sm hover:bg-[#6449FC] hover:text-white"
+                className="border border-gray-400 px-4 py-2 rounded text-sm hover:bg-[#282828] hover:text-white"
               >
                 엑셀 다운로드
               </button>
@@ -941,13 +941,13 @@ const LogList = ({
                           </td>
                           <td className="p-3 border-b border-gray-200">
 
-                            { 
+                            {
                             (isAdmin) ?(log.adjustmentPrice):(isDistributor?(log.adjustmentPriceAgency):(log.adjustmentPriceUser))
                             }
                           </td>
                           <td className="p-3 border-b border-gray-200">
 
-                            { 
+                            {
                             (isAdmin) ?(log.refundPrice):(isDistributor?(log.refundPriceAgency):(log.refundPriceUser))
                             }
                           </td>
@@ -988,7 +988,7 @@ const LogList = ({
             key={p}
             variant={p === page ? 'default' : 'ghost'}
             onClick={() => setPage(p)}
-            className={`px-3 py-1 text-sm hover:bg-[#5a3ee0] ${p === page ? 'bg-[#6449FC] text-white' : 'text-gray-600 hover:text-white'}`}
+            className={`px-3 py-1 text-sm hover:bg-[#141414] ${p === page ? 'bg-[#282828] text-white' : 'text-gray-600 hover:text-white'}`}
           >
             {p}
           </Button>

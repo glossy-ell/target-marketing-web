@@ -1,14 +1,13 @@
 'use client';
 
+import SlotRankingModal from '@/components/modals/SlotRankingModal';
+import { Button } from '@/components/ui/button';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import SlotRankingModal from '@/components/modals/SlotRankingModal';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import * as Tooltip from '@radix-ui/react-tooltip';
-import React from 'react';
-import { useRouter } from 'next/navigation';
 
 interface Slot {
   seq: number;
@@ -161,14 +160,14 @@ const SlotList = (   {
       else
         setIsKeyword(true);
       setCurrentSort(selectedModalSlot.sortation);
-     
+
       setKeyword(selectedModalSlot.keyword || "");
 
       setSecretKey1(selectedModalSlot.secretKey1 || "");
       setSecretKey2(selectedModalSlot.secretKey2 || "");
       setSecretKey3(selectedModalSlot.secretKey3 || "");
       setSecretKey4(selectedModalSlot.secretKey4 || "");
-      
+
 
       setSceretKeyLinkType1(selectedModalSlot.sceretKeyLinkType1 || 0);
       setSceretKeyLinkType2(selectedModalSlot.sceretKeyLinkType2 || 0);
@@ -227,7 +226,7 @@ const SlotList = (   {
               alert("모든 시크릿 키워드를 입력해주세요.");
               return;
             }
-            
+
     }
 
          if (!isKeyword) {
@@ -237,7 +236,7 @@ const SlotList = (   {
               secretLandingKey3,
               secretLandingKey4,
             ];
-    
+
             const hasEmptyLanding = landingKeys.slice(0, keywordLimit??4).some(
               (key) => !key || key.trim() === ""
             );
@@ -265,7 +264,7 @@ const SlotList = (   {
       sceretKeyLinkType2,
       sceretKeyLinkType3,
       sceretKeyLinkType4,
-      
+
     };
    try {
      const res = await fetch('/api/slots/keyword', {
@@ -277,9 +276,9 @@ const SlotList = (   {
      if (!res.ok) {
       if (res.status === 401) {
         router.push('/');
-        return; 
+        return;
       }
-  
+
        throw new Error('저장 실패');
      }
 
@@ -299,7 +298,7 @@ const SlotList = (   {
     setSelectAll(false);
  };
 
-  
+
   const maxButtons = 10;
   const half = Math.floor(maxButtons / 2);
   let startPage = Math.max(1, page - half);
@@ -380,7 +379,7 @@ const SlotList = (   {
         slotSearchType :slotSearchType.toString(),
       });
 
-    
+
 
       const response = await fetch(`/api/slots?${params}`);
 
@@ -392,7 +391,7 @@ const SlotList = (   {
       if (!response.ok) throw new Error('데이터를 불러오는데 실패했습니다.');
 
       const json = await response.json();
-  
+
 
       const { data, totalPages } = json;
       if (!Array.isArray(data)) throw new Error('잘못된 데이터 형식입니다.');
@@ -407,7 +406,7 @@ const SlotList = (   {
       setLoading(false);
     }
   };
-  const [searchStart,setSearchStart] = useState<boolean>(false);  
+  const [searchStart,setSearchStart] = useState<boolean>(false);
 
   useEffect(() => {
       setPage(1);
@@ -434,7 +433,7 @@ const SlotList = (   {
       return;
     }
 
-    
+
     const isWeekend = (day === 0 || day === 6);
 
     if(!weekendOpen ){
@@ -549,7 +548,7 @@ const SlotList = (   {
       });
       if (res.status === 401) {
         window.location.href = '/';
-        return; 
+        return;
       }
 
       if (!res.ok) {
@@ -596,7 +595,7 @@ const SlotList = (   {
       confirmButtonText: '삭제',
       cancelButtonText: '취소',
       color: '#000',
-      confirmButtonColor: '#6449FC',
+      confirmButtonColor: '#282828',
       cancelButtonColor: '#555',
     });
 
@@ -626,7 +625,7 @@ const SlotList = (   {
         icon: 'success',
         title: '선택된 슬롯이 삭제되었습니다.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
     } catch (error) {
       console.error(error);
@@ -634,7 +633,7 @@ const SlotList = (   {
         icon: 'error',
         title: '삭제 중 오류가 발생했습니다.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
     }
   };
@@ -656,7 +655,7 @@ const SlotList = (   {
         icon: 'warning',
         title: '삭제할 슬롯을 선택하세요.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
       return;
     }
@@ -668,7 +667,7 @@ const SlotList = (   {
       confirmButtonText: '삭제',
       cancelButtonText: '취소',
       color: '#000',
-      confirmButtonColor: '#6449FC',
+      confirmButtonColor: '#282828',
       cancelButtonColor: '#555',
     });
 
@@ -695,7 +694,7 @@ const SlotList = (   {
         icon: 'success',
         title: '선택된 슬롯이 삭제되었습니다.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
     }
   };
@@ -718,7 +717,7 @@ const SlotList = (   {
     });
       if (response.status === 401) {
         window.location.href = '/';
-        return; 
+        return;
       }
 
     if (!response.ok) {
@@ -747,13 +746,13 @@ const SlotList = (   {
       alert(`수정 작업이 제한되어있습니다.`);
       return;
     }
-    
+
     if (selectedIds.length === 0) {
       await MySwal.fire({
         icon: 'warning',
         title: '수정할 슬롯을 선택하세요.',
         color: '#000',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
       return;
     }
@@ -794,7 +793,7 @@ const SlotList = (   {
       showCancelButton: true,
       confirmButtonText: '수정',
       cancelButtonText: '취소',
-      confirmButtonColor: '#6449FC',
+      confirmButtonColor: '#282828',
       cancelButtonColor: '#555',
     });
 
@@ -813,7 +812,7 @@ const SlotList = (   {
         icon: 'success',
         title: '수정 완료',
         text: `${selectedIds.length}개의 슬롯이 수정되었습니다.`,
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
     } catch (err: any) {
       console.error('수정 실패:', err);
@@ -821,7 +820,7 @@ const SlotList = (   {
         icon: 'error',
         title: '수정 실패',
         text: '문제가 발생했습니다. 다시 시도해주세요.',
-        confirmButtonColor: '#6449FC',
+        confirmButtonColor: '#282828',
       });
     }
   };
@@ -845,7 +844,7 @@ const SlotList = (   {
         icon: 'warning',
         title: '연장할 슬롯을 선택하세요.',
         color: '#000',              // 흰색 글자
-        confirmButtonColor: '#6449FC', // 버튼 흰색
+        confirmButtonColor: '#282828', // 버튼 흰색
       });
       return;
     }
@@ -867,7 +866,7 @@ const SlotList = (   {
         confirmButtonText: '확인',
         cancelButtonText: '취소',
         color: '#000',                // 흰색 글자
-        confirmButtonColor: '#6449FC',   // 버튼 흰색
+        confirmButtonColor: '#282828',   // 버튼 흰색
         cancelButtonColor: '#555',    // 취소 버튼 약간 밝은 회색
         inputValidator: (value) => {
           if (!value || Number(value) <= 0) {
@@ -876,7 +875,7 @@ const SlotList = (   {
           return null;
         },
       });
- 
+
       if (!isConfirmed) {
         return; // 사용자가 '취소' 눌렀으면 함수 종료
       }
@@ -887,10 +886,10 @@ const SlotList = (   {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ seqs: selectedIds, extendDays: Number(daysToExtend) }),
         });
-        
+
         if(res.status === 401) {
           window.location.href = '/';
-          return; 
+          return;
         }
         if (res.status === 429) {
           alert("이미 연장 요청한 항목이 존재합니다.");
@@ -905,7 +904,7 @@ const SlotList = (   {
             icon: 'success',
             title: `선택된 슬롯이 ${daysToExtend}일 연장되었습니다.`,
             color: '#000',
-            confirmButtonColor: '#6449FC',
+            confirmButtonColor: '#282828',
           });
         } else {
           MySwal.fire({
@@ -913,7 +912,7 @@ const SlotList = (   {
             title: `선택된 슬롯이 ${daysToExtend}일 연장 요청되었습니다.`,
             text: `관리자 승인 후 연장됩니다.`,
             color: '#000',
-            confirmButtonColor: '#6449FC',
+            confirmButtonColor: '#282828',
           });
         }
 
@@ -927,7 +926,7 @@ const SlotList = (   {
           icon: 'error',
           title: '연장 중 오류가 발생했습니다.',
           color: '#fff',
-          confirmButtonColor: '#6449FC',
+          confirmButtonColor: '#282828',
         });
       }
     };
@@ -958,7 +957,7 @@ const SlotList = (   {
         confirmButtonText: '확인',
         cancelButtonText: '취소',
         color: '#000',                // 흰색 글자
-        confirmButtonColor: '#6449FC',   // 버튼 흰색
+        confirmButtonColor: '#282828',   // 버튼 흰색
         cancelButtonColor: '#555',    // 취소 버튼 약간 밝은 회색
         inputValidator: (value) => {
           if (!value || Number(value) <= 0) {
@@ -967,7 +966,7 @@ const SlotList = (   {
           return null;
         },
       });
- 
+
       if (!isConfirmed) {
         return; // 사용자가 '취소' 눌렀으면 함수 종료
       }
@@ -981,7 +980,7 @@ const SlotList = (   {
 
         if (res.status === 401) {
           window.location.href = '/';
-          return; 
+          return;
         }
         if (res.status === 429) {
           alert("이미 연장 요청한 항목입니다.");
@@ -994,7 +993,7 @@ const SlotList = (   {
             icon: 'success',
             title: `해당 슬롯이 ${daysToExtend}일 연장되었습니다.`,
             color: '#000',
-            confirmButtonColor: '#6449FC',
+            confirmButtonColor: '#282828',
           });
         }else{
           await MySwal.fire({
@@ -1002,7 +1001,7 @@ const SlotList = (   {
             title: `해당 슬롯이 ${daysToExtend}일 연장 요청되었습니다.`,
             text: `관리자 승인 후 연장됩니다.`,
             color: '#000',
-            confirmButtonColor: '#6449FC',
+            confirmButtonColor: '#282828',
           });
         }
 
@@ -1013,7 +1012,7 @@ const SlotList = (   {
           icon: 'error',
           title: '연장 중 오류가 발생했습니다.',
           color: '#000',
-          confirmButtonColor: '#6449FC',
+          confirmButtonColor: '#282828',
         });
       }
     };
@@ -1028,7 +1027,7 @@ const SlotList = (   {
     alert("선택된 슬롯이 없습니다");
     return;
   }
-  
+
   const popupWidth = 1200;
   const popupHeight = 900;
   const left = window.screenX + (window.outerWidth - popupWidth) / 2;
@@ -1093,7 +1092,7 @@ const SlotList = (   {
             slotSearchType : slotSearchType.toString(),
           });
 
-    
+
 
           try {
             const res = await fetch(`/api/slots/all?${params}`, {
@@ -1204,7 +1203,7 @@ const SlotList = (   {
               slotSearchType : slotSearchType.toString(),
             });
 
-      
+
 
             try {
               const res = await fetch(`/api/slots/spec?${params}`, {
@@ -1267,7 +1266,7 @@ const SlotList = (   {
       setRankingLoadingSlotSeq(seq); // 로딩 시작
 
       try {
-    
+
         //const res = fetch(`http://14.7.33.34/rank/check_slot/${seq}`, {
 
         fetch(`http://14.7.33.34/rank/check_slot/${seq}`, { method: 'GET' }).catch(() => {})
@@ -1291,7 +1290,7 @@ const SlotList = (   {
           <input
             type="text"
             placeholder="아이디, 키워드, 상품명, 프로덕트, 벤더"
-            className="bg-white text-black border text-xs border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6449FC] w-full"
+            className="bg-white text-black border text-xs border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#282828] w-full"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => {
@@ -1321,7 +1320,7 @@ const SlotList = (   {
 
           <button
             style={{ display: currentUser && (currentUser.excelAllow==1)? '':'none' }}
-            className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
             onClick={openExcelPopup}
           >
             엑셀 다운로드
@@ -1329,7 +1328,7 @@ const SlotList = (   {
 
           <button
             style={{ display: currentUser && (currentUser.excelAllow==1)? '':'none' }}
-            className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
             onClick={openExcelTotalPopup}
           >
             엑셀 전체 다운로드
@@ -1337,16 +1336,16 @@ const SlotList = (   {
           {
             <button
             style={{ display: currentUser && (currentUser.excelAllow==1) && currentUser.role ==0 ? '':'none' }}
-            className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
             onClick={openExcelSpecPopup}
           >
             엑셀 일부 다운로드
           </button>
           }
-{/* 
+{/*
           <button
             style={{ display: currentUser && currentUser.excelAllow === 1 ? '' : 'none' }}
-            className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
             onClick={openExcelUploadPopup}
           >
             엑셀 업로드
@@ -1380,7 +1379,7 @@ const SlotList = (   {
             삭제
           </button>
           <button
-            className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-3 py-2 rounded text-sm"
+            className="bg-[#282828] hover:bg-[#141414] text-white px-3 py-2 rounded text-sm"
             onClick={handleEdit}
           >
             수정
@@ -1472,7 +1471,7 @@ const SlotList = (   {
                             checked={selectedIds.includes(slot.seq)}
                             onChange={() => handleCheckboxChange(slot.seq)}
                           />
-                        </td>  
+                        </td>
                         <td className="p-3 border-b border-gray-200">
                           {slot.seq}
                         </td>
@@ -1575,7 +1574,7 @@ const SlotList = (   {
                         }
 
 
-                    
+
                         <td className="p-3 border-b border-gray-200 max-w-[30px] break-words">
                             <Tooltip.Provider delayDuration={100}>
 
@@ -1633,7 +1632,7 @@ const SlotList = (   {
                                          ? 'text-green-600' : 'text-red-600'} ${currentUser?.additionalRegAllow === 1 ? 'cursor-pointer' : ''}`}
                                       onClick={() => {
 
-                                        if(currentUser?.additionalRegAllow === 1){ 
+                                        if(currentUser?.additionalRegAllow === 1){
                                           const params = new URLSearchParams({
                                             seq:slot.seq.toString(),
                                             thumbnail: slot.thumbnail || '',
@@ -1658,7 +1657,7 @@ const SlotList = (   {
                                             `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`
                                           );
                                         }
-                                        
+
                                       }}
                                     >
                                       {slot.status && slot.sortation!=0   &&
@@ -1693,7 +1692,7 @@ const SlotList = (   {
                                     className={`
                                       bg-black text-white p-2 rounded text-xs whitespace-pre-wrap max-w-[300px]
                                       ${((slot.status && slot.sortation!=0  &&
-                                        
+
                                         (
                                           (slot.keywordLimit === 4 && (
                                               (slot.sortation === 2 && (slot.secretLandingKey1 && slot.secretLandingKey2 && slot.secretLandingKey3  && slot.secretLandingKey4 )) ||
@@ -1715,9 +1714,9 @@ const SlotList = (   {
                                     `}
                                     sideOffset={10}
                                   >
-                                  
+
                                     {
-                                    
+
                                     (slot.sortation==0   ||(
                                           (slot.keywordLimit === 4 && (
                                               (slot.sortation === 2 && (!slot.secretLandingKey1 || !slot.secretLandingKey2 || !slot.secretLandingKey3|| !slot.secretLandingKey4 )) ||
@@ -1737,11 +1736,11 @@ const SlotList = (   {
                                           ))
                                         )
                                       ? `오류 0 \n`: ``)
-                                      
-                                      }
-                                      
 
-                                      {((!slot.keyword || !slot.productLink || !slot.singleLink) && !slot.errMsg || slot.status==false && !slot.errMsg ) 
+                                      }
+
+
+                                      {((!slot.keyword || !slot.productLink || !slot.singleLink) && !slot.errMsg || slot.status==false && !slot.errMsg )
                                         ? `200위 이내에 상품이 존재하지 않습니다.\n(5분이후에도 동일할경우 재등록해주세요)`
                                       :  slot.errMsg}
                                   </Tooltip.Content>
@@ -1755,7 +1754,7 @@ const SlotList = (   {
                               style={{
                                 display: isEditing ? 'none' : '',
                               }}
-                              className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-2 py-1 rounded-md w-[60px]"
+                              className="bg-[#282828] hover:bg-[#141414] text-white px-2 py-1 rounded-md w-[60px]"
                               onClick={() => {
 
                                 const now = new Date();
@@ -1776,7 +1775,7 @@ const SlotList = (   {
                                     alert(`수정 작업이 제한되어있습니다.`);
                                     return;
                                   }
-                                  
+
 
 
                                 setSelectedModalSlot(slot);
@@ -1787,7 +1786,7 @@ const SlotList = (   {
                             </Button>
                           </td>
                         )}
-                        
+
                         <td className="p-3 border-b border-gray-200 max-w-[80px] break-words" style={{ whiteSpace: 'pre-wrap' }}>
                           {slot.userId}
                         </td>
@@ -1825,7 +1824,7 @@ const SlotList = (   {
                                       {
                                       (function renderRank(rank) {
                                         const today = new Date();
-                                        const todayStr = today.toISOString().split("T")[0]; 
+                                        const todayStr = today.toISOString().split("T")[0];
                                         const dateOnly = slot.createdAt.toString().split("T")[0];
                                         let dateDiff = 1;
 
@@ -2059,12 +2058,12 @@ const SlotList = (   {
                               style={{
                                 display:
                                   currentUser &&
-                                  currentUser.rankingCheckAllow === 1 
-                                  // && (!(slot.singleLink?.includes('brand.')) ||  !(slot.productLink == null||slot.productLink=="")) 
+                                  currentUser.rankingCheckAllow === 1
+                                  // && (!(slot.singleLink?.includes('brand.')) ||  !(slot.productLink == null||slot.productLink==""))
                                     ? ''
                                     : 'none',
                               }}
-                              className="h-9 bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-2 w-[60px] rounded-md text-[12px]"
+                              className="h-9 bg-[#282828] hover:bg-[#141414] text-white px-2 w-[60px] rounded-md text-[12px]"
                               onClick={() => fetchCheckSlot(slot.seq)}
                               disabled={rankingLoadingSlotSeq === slot.seq} // 중복 클릭 방지
                             >
@@ -2094,7 +2093,7 @@ const SlotList = (   {
                               )}
                             </Button>
                               <Button
-                                className="bg-[#6449FC] hover:bg-[#5a3ee0] text-white px-2 py-1 rounded-md text-[12px]"
+                                className="bg-[#282828] hover:bg-[#141414] text-white px-2 py-1 rounded-md text-[12px]"
                                 onClick={() => handleEditClick(index)}
                               >
                                 수정
@@ -2129,7 +2128,7 @@ const SlotList = (   {
               <div className="flex items-center space-x-4">
                 <label className="flex items-center space-x-1 cursor-pointer">
                     <input
-                      className="cursor-pointer accent-[#6449FC]"
+                      className="cursor-pointer accent-[#282828]"
                       type="radio"
                       name="type"
                       checked={isKeyword === true}
@@ -2140,7 +2139,7 @@ const SlotList = (   {
 
                   <label className="flex items-center space-x-1 cursor-pointer">
                     <input
-                      className="cursor-pointer accent-[#6449FC]"
+                      className="cursor-pointer accent-[#282828]"
                       type="radio"
                       name="type"
                       checked={isKeyword === false}
@@ -2183,7 +2182,7 @@ const SlotList = (   {
                     <option value={3}>플러스</option>
                   </select>
               </div>
-            
+
              <div className="flex items-center gap-2"
                style={{
                   display:
@@ -2193,7 +2192,7 @@ const SlotList = (   {
               <input
                 type="text"
                 className="w-full border px-3 py-2 rounded"
-               
+
                 placeholder={isKeyword ? "시크릿 키워드1":"시크릿 랜딩 1"}
                 value={isKeyword ? secretKey1 : secretLandingKey1}
                  onChange={(e) => {
@@ -2222,7 +2221,7 @@ const SlotList = (   {
                   display:
                     keywordLimit && keywordLimit>=2 ? '' : 'none',
                 }}
-            >     
+            >
               <input
                 type="text"
                 className="w-full border px-3 py-2 rounded"
@@ -2253,7 +2252,7 @@ const SlotList = (   {
                   display:
                     keywordLimit && keywordLimit>=3 ? '' : 'none',
                 }}
-            >    
+            >
               <input
                 type="text"
                 className="w-full border px-3 py-2 rounded"
@@ -2279,13 +2278,13 @@ const SlotList = (   {
                 <option value={3}>플러스</option>
               </select>
             </div>
-          
+
             <div className="flex items-center gap-2"
               style={{
                   display:
                     keywordLimit && keywordLimit>=4 ? '' : 'none',
                 }}
-            >  
+            >
               <input
                 type="text"
                 className="w-full border px-3 py-2 rounded"
@@ -2312,7 +2311,7 @@ const SlotList = (   {
               </select>
             </div>
 
-          
+
 
             </div>
 
@@ -2325,7 +2324,7 @@ const SlotList = (   {
               </button>
               <button
                 onClick={() => handleConfirmModal(selectedModalSlot!.seq)}
-                className="px-4 py-2 rounded text-white bg-[#6449FC] hover:bg-[#5a3ee0]"
+                className="px-4 py-2 rounded text-white bg-[#282828] hover:bg-[#141414]"
               >
                 확인
               </button>
@@ -2334,7 +2333,7 @@ const SlotList = (   {
         </div>
       )}
             </div>
-            
+
           )}
 
           {rankingSlotSeq !== null && (
@@ -2352,7 +2351,7 @@ const SlotList = (   {
                 key={p}
                 variant={p === page ? 'default' : 'ghost'}
                 onClick={() => setPage(p)}
-                className={`px-3 py-1 text-sm hover:bg-[#5a3ee0] ${p === page ? 'bg-[#6449FC] text-white' : 'text-gray-600 hover:text-white'}`}
+                className={`px-3 py-1 text-sm hover:bg-[#141414] ${p === page ? 'bg-[#282828] text-white' : 'text-gray-600 hover:text-white'}`}
               >
                 {p}
               </Button>

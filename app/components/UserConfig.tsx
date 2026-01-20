@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from './ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Button } from './ui/button';
 
 
 interface User {
@@ -54,10 +54,10 @@ export default function AgencyConfig(props: Props) {
          setError('로그인 정보가 없습니다.');
        }
      };
- 
+
      fetchCurrentUser();
    }, []);
- 
+
   const handleSubmit = async (seq:number) => {
       try {
         if (!currentUser) return;
@@ -188,14 +188,14 @@ export default function AgencyConfig(props: Props) {
           body: JSON.stringify({
             userSeq: seq,
             editorSeq: currentUser.seq,
-            [roleName]: role,   
+            [roleName]: role,
           }),
         });
 
         if (!res.ok) {
           const data = await res.json();
           alert(`오류가 발생했습니다 : ${data.error || data.message}`);
-        } 
+        }
     } catch (err) {
       console.error(err);
       alert('요청 중 오류 발생');
@@ -204,13 +204,13 @@ export default function AgencyConfig(props: Props) {
 
 
   return (
-    <div className="col-span-2 mt-4 mb-4 p-4 border rounded bg-white shadow-sm cursor-pointer"  
+    <div className="col-span-2 mt-4 mb-4 p-4 border rounded bg-white shadow-sm cursor-pointer"
     onClick={(e) => {
       // 정확히 이 div 자체가 클릭된 경우만 toggle 실행
       if (e.target === e.currentTarget) {
         setIsOpen((prev) => !prev);
       }
-    }} 
+    }}
     >
           <div className="flex justify-between items-center cursor-pointer"
              onClick={() => setIsOpen((prev) => !prev)}
@@ -260,7 +260,7 @@ export default function AgencyConfig(props: Props) {
                         handleChangeRole(user.seq, e.target.checked, "excelAllow");
                       }}
                     />
-                    <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#6449FC] transition-colors duration-200"></div>
+                    <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#282828] transition-colors duration-200"></div>
                     <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 peer-checked:translate-x-5"></div>
                   </label>
                 </td>
@@ -279,7 +279,7 @@ export default function AgencyConfig(props: Props) {
                         handleChangeRole(user.seq, e.target.checked, "additionalRegAllow");
                       }}
                     />
-                    <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#6449FC] transition-colors duration-200"></div>
+                    <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#282828] transition-colors duration-200"></div>
                     <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 peer-checked:translate-x-5"></div>
                   </label>
                 </td>
@@ -298,7 +298,7 @@ export default function AgencyConfig(props: Props) {
                         handleChangeRole(user.seq, e.target.checked, "rankingCheckAllow");
                       }}
                     />
-                    <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#6449FC] transition-colors duration-200"></div>
+                    <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#282828] transition-colors duration-200"></div>
                     <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 peer-checked:translate-x-5"></div>
                   </label>
                 </td>
@@ -346,7 +346,7 @@ export default function AgencyConfig(props: Props) {
                               setPrice(user.price);
                               setEditRow(user.seq); // 현재 row만 edit 모드로 설정
                             }}
-                            className="text-[#6449FC] underline text-sm ml-2"
+                            className="text-[#282828] underline text-sm ml-2"
                           >
                             수정
                           </button>
@@ -370,7 +370,7 @@ export default function AgencyConfig(props: Props) {
               key={p}
               variant={p === page ? 'default' : 'ghost'}
               onClick={() => setPage(p)}
-              className={`px-3 py-1 text-sm hover:bg-[#5a3ee0] ${p === page ? 'bg-[#6449FC] text-white' : 'text-gray-600 hover:text-white'}`}
+              className={`px-3 py-1 text-sm hover:bg-[#141414] ${p === page ? 'bg-[#282828] text-white' : 'text-gray-600 hover:text-white'}`}
             >
               {p}
             </Button>
