@@ -4,8 +4,8 @@ const poolConfig: PoolOptions = {
   host: "14.7.33.34",
   user: "root",
   password: "gl0ssyell",
-  //database: "target-marketing", // 실서버
-  database: "target-marketing-dev",
+  //database: "target_marketing", // 실서버
+  database: "target_marketing_dev",
   waitForConnections: true,
   connectionLimit: 10,
 };
