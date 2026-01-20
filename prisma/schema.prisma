@@ -1,0 +1,68 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  seq            Int      @id @default(autoincrement()) // 순번 (PK)
+  id             String   @unique                      // 아이디 (고유 값)
+  name           String                                 // 이름
+  password       String                                 // 암호화된 비밀번호
+  role           Int      @default(0)                  // 역할 (0: 관리자, 1: 총판, 2: 대행사, 3: 사용자)
+  agencyId       Int?                                   // 총판 ID (nullable)
+  distributorId  Int?                                   // 유통사 ID (nullable)
+
+  // 관계 설정: 총판 및 대행사
+  agency         User?    @relation("Agency", fields: [agencyId], references: [seq], onDelete: SetNull)
+  distributor    User?    @relation("Distributor", fields: [distributorId], references: [seq], onDelete: SetNull)
+
+  isDeleted      Int      @default(0)                  // 삭제 여부 (기본값 0)
+  createdAt      DateTime @default(now())              // 생성일 (기본값 현재 시간)
+
+  // 역방향 관계 (해당 유저를 총판 또는 유통사로 참조하는 유저들)
+  agencyRel      User[]   @relation("Agency")
+  distributorRel User[]   @relation("Distributor")
+
+  // User와 Slot 관계 (1:N)
+  slots          Slot[]   @relation("UserSlots")
+
+  // 총판 또는 유통사로서 연결된 슬롯들 (1:N)
+  slotsAsAgency      Slot[]   @relation("SlotAgency")
+  slotsAsDistributor Slot[]   @relation("SlotDistributor")
+}
+
+model Slot {
+  seq           Int      @id @default(autoincrement()) // 순번 (PK)
+  userId        Int                                   // 사용자 ID (User 테이블 참조)
+  agencyId      Int?                                     // 총판 ID (nullable)
+  distributorId Int?                                     // 유통사 ID (nullable)
+  productLink   String?                                  // 상품 링크
+  keyword       String?                                  // 작업 키워드
+  startDate     DateTime                                 // 작업 시작일
+  endDate       DateTime                                 // 작업 종료일
+  thumbnail     String?                                  // 썸네일 링크 (nullable)
+  rank          Int?                                     // 순위 (nullable)
+  createdAt     DateTime @default(now())                // 생성일
+  memo   String?                                  // 메모
+  subKeyword   String?                                  // 상품 링크
+
+  // 관계 설정
+  user          User     @relation("UserSlots", fields: [userId], references: [seq], onDelete: Cascade)
+  agency        User?    @relation("SlotAgency", fields: [agencyId], references: [seq], onDelete: SetNull)
+  distributor   User?    @relation("SlotDistributor", fields: [distributorId], references: [seq], onDelete: SetNull)
+}
+
+
+model SlotRanking {
+  seq         Int      @id @default(autoincrement()) // 히스토리아이디 (PK)
+  ranking     String?  @default("0")                 // 페이지순위
+  productLink String?  @default("")                  // 상품 URL
+  keyword     String?  @default("")                  // 작업검색어
+  created     DateTime? @default(now())              // 수집일시
+
+  @@map("slot_ranking")
+}
