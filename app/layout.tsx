@@ -11,8 +11,8 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Elixir.',
-  description: 'Emega Official',
+  title: 'TARGET MARKETING',
+  description: 'Online E-Commerce',
 };
 
 export default function RootLayout({
