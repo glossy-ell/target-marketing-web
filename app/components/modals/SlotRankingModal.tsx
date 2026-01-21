@@ -1,20 +1,14 @@
 // components/modals/SlotRankingModal.tsx
 
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ChartOptions, Plugin } from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
+  CategoryScale, Chart as ChartJS, ChartOptions, Legend, LinearScale, LineElement,
+  PointElement, Title,
+  Tooltip
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { useEffect, useState } from 'react';
+import { Line } from 'react-chartjs-2';
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend, ChartDataLabels);
 
 interface SlotRankingModalProps {
@@ -46,15 +40,15 @@ const SlotRankingModal = ({ slotSeq, onClose }: SlotRankingModalProps) => {
             // const dateKey = dateObj.toISOString().slice(0,10);
 
             const prev = acc[dateKey];
-        
+
             if (!prev || new Date(cur.created) > new Date(prev.created)) {
               acc[dateKey] = cur;
             }
-        
+
             return acc;
           }, {} as Record<string, RankingData>)
         );
-        
+
         dailyLastRank.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
 
         setRankings(dailyLastRank);
@@ -81,8 +75,8 @@ const SlotRankingModal = ({ slotSeq, onClose }: SlotRankingModalProps) => {
           return rank === 0 ? 201 : rank; // 0 → 201로 치환
         }),
         fill: false,
-        borderColor: '#3b82f6',
-        backgroundColor: '#3b82f6',
+        borderColor: '#1f2937',
+        backgroundColor: '#1f2937',
         tension: 0.3,
       },
     ],
@@ -108,7 +102,7 @@ const SlotRankingModal = ({ slotSeq, onClose }: SlotRankingModalProps) => {
         align: 'end',
         anchor: 'end',
         offset: 1,
-        color: '#3b82f6',
+        color: '#1f2937',
         font: {
           weight: 'bold',
           size: 12,

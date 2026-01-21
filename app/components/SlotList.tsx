@@ -302,7 +302,7 @@ const SlotList = (   {
   const maxButtons = 10;
   const half = Math.floor(maxButtons / 2);
   let startPage = Math.max(1, page - half);
-  let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+  const endPage = Math.min(totalPages, startPage + maxButtons - 1);
   if (endPage - startPage + 1 < maxButtons) {
     startPage = Math.max(1, endPage - maxButtons + 1);
   }
@@ -1385,7 +1385,7 @@ const SlotList = (   {
             수정
           </button>
           <button
-            className="bg-[#9760ff] text-white px-3 py-2 rounded hover:bg-[#651eeb] text-sm"
+            className="bg-[#282828] text-white px-3 py-2 rounded hover:bg-[#141414] text-sm"
             onClick={handleExtend}
           >
             연장
@@ -1839,7 +1839,7 @@ const SlotList = (   {
                                         }
 
                                         // rank가 문자열일 수도 있으니 문자열로 변환
-                                        let rankStr = String(rank);
+                                        const rankStr = String(rank);
                                         let parts = rankStr.split('>');
 
                                         // dateDiff에 따라 출력 범위 조절
@@ -1867,8 +1867,8 @@ const SlotList = (   {
 
                                           if (num === 0) {
                                             const prevNum = parseInt(parts[idx - 1], 10);
-                                            let color = prevNum === 0 ? 'black' : 'blue';
-                                            let arrow = prevNum !== 0 ? '↓' : '';
+                                            const color = prevNum === 0 ? 'black' : 'blue';
+                                            const arrow = prevNum !== 0 ? '↓' : '';
                                             return (
                                               <React.Fragment key={idx}>
                                                 <span style={{ color: 'black' }}> {' > '} </span>
@@ -1912,7 +1912,7 @@ const SlotList = (   {
                                     href={slot.productLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-purple-700 hover:underline truncate inline-block max-w-[100px] cursor-pointer"
+                                    className="text-gray-700 hover:underline truncate inline-block max-w-[100px] cursor-pointer"
                                   >
                                     {slot.productLink}
                                   </a>
@@ -1949,7 +1949,7 @@ const SlotList = (   {
                                     href={slot.singleLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-purple-700 hover:underline truncate inline-block max-w-[100px] cursor-pointer"
+                                    className="text-gray-700 hover:underline truncate inline-block max-w-[100px] cursor-pointer"
                                   >
                                     {slot.singleLink}
                                   </a>
@@ -2040,7 +2040,7 @@ const SlotList = (   {
                           {isEditing ? (
                             <>
                               <Button
-                                className="bg-[#9760ff] hover:bg-[#651eeb] text-white px-3 py-1 rounded-md"
+                                className="bg-[#282828] hover:bg-[#141414] text-white px-3 py-1 rounded-md"
                                 onClick={() => handleConfirm(slot.seq)}
                               >
                                 저장
@@ -2106,7 +2106,7 @@ const SlotList = (   {
                                 삭제
                               </Button>
                               <Button
-                                className="bg-[#9760ff] hover:bg-[#651eeb] text-white px-2 py-1 rounded-md text-[12px]"
+                                className="bg-[#282828] hover:bg-[#141414] text-white px-2 py-1 rounded-md text-[12px]"
                                 onClick={() => handleSingleExtend(slot.seq)}
                               >
                                 연장

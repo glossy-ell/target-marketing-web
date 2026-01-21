@@ -1855,7 +1855,7 @@ const SlotList = () => {
                                     href={slot.productLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-purple-700 hover:underline truncate inline-block max-w-full cursor-pointer"
+                                    className="text-gray-700 hover:underline truncate inline-block max-w-full cursor-pointer"
                                   >
                                     {slot.productLink}
                                   </a>
@@ -1893,7 +1893,7 @@ const SlotList = () => {
                                     href={slot.singleLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-purple-700 hover:underline truncate inline-block max-w-full cursor-pointer"
+                                    className="text-gray-700 hover:underline truncate inline-block max-w-full cursor-pointer"
                                   >
                                     {slot.singleLink}
                                   </a>

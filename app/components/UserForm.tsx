@@ -70,7 +70,7 @@ const UserForm = ({ mode, initialData = {}, currentUser, onSuccess }: Props) => 
       )}
       <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" required className="w-full p-2 border rounded" />
       <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호" type="password" className="w-full p-2 border rounded" />
-      
+
       <select value={role} onChange={(e) => setRole(Number(e.target.value))} className="w-full p-2 border rounded">
         <option value={1}>총판</option>
         <option value={2}>대행사</option>
