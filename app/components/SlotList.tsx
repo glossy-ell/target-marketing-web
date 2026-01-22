@@ -487,7 +487,7 @@ const SlotList = (   {
 
   const updateSlots = async (
     ids: number[],
-    changes: { singleLink?: string; keyword?: string; }
+    changes: { singleLink?: string; keyword?: string; mid?: string; }
   ) => {
     const body = {
       seqs: ids,
@@ -547,10 +547,12 @@ const SlotList = (   {
       title: '수정할 정보를 입력하세요',
       html:
         `<input id="swal-input1" class="swal2-input" placeholder="키워드">` +
-        `<input id="swal-input2" class="swal2-input" placeholder="상품 링크">`,
+        `<input id="swal-input2" class="swal2-input" placeholder="상품 링크">` +
+        `<input id="swal-input3" class="swal2-input" placeholder="MID">`,
       focusConfirm: false,
       didOpen: () => {
         const singleLinkInput = document.getElementById('swal-input2') as HTMLInputElement;
+        const midInput = document.getElementById('swal-input3') as HTMLInputElement;
 
         singleLinkInput.addEventListener('input', () => {
           const rawValue = singleLinkInput.value;
@@ -558,12 +560,19 @@ const SlotList = (   {
           singleLinkInput.value = trimmedValue;  // 입력란에도 공백 제거 반영
         });
 
+        midInput.addEventListener('input', () => {
+          const rawValue = midInput.value;
+          const trimmedValue = rawValue.trim();
+          midInput.value = trimmedValue;
+        });
+
       },
       preConfirm: () => {
         const keyword = (document.getElementById('swal-input1') as HTMLInputElement).value.trim();
         const singleLink = (document.getElementById('swal-input2') as HTMLInputElement).value.trim();
+        const mid = (document.getElementById('swal-input3') as HTMLInputElement).value.trim();
 
-        if (!singleLink && !keyword) {
+        if (!singleLink && !keyword && !mid) {
           MySwal.showValidationMessage('최소 하나는 입력해야 합니다.');
           return null;
         }
@@ -571,6 +580,7 @@ const SlotList = (   {
         return {
           ...(singleLink && { singleLink }),
           ...(keyword && { keyword }),
+          ...(mid && { mid }),
         };
       },
       showCancelButton: true,

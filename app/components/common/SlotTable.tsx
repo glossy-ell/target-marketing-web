@@ -147,6 +147,7 @@ const SlotTable: React.FC<SlotTableProps> = ({
             <th className="px-5 py-4 border-b border-gray-300">클라이언트 ID</th>
             <th className="px-5 py-4 border-b border-gray-300">키워드</th>
             <th className="px-5 py-4 border-b border-gray-300">상품 링크</th>
+            <th className="px-5 py-4 border-b border-gray-300">MID</th>
             <th className="px-5 py-4 border-b border-gray-300">시작일</th>
             <th className="px-5 py-4 border-b border-gray-300">종료일</th>
             <th className="px-5 py-4 border-b border-gray-300">메모</th>
@@ -385,6 +386,39 @@ const SlotTable: React.FC<SlotTableProps> = ({
                             sideOffset={5}
                           >
                             {slot.singleLink}
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                </Tooltip.Provider>
+
+                <Tooltip.Provider delayDuration={100}>
+                  <td className="p-3 border-b border-gray-200 max-w-xs break-words">
+                    {isEditing && handleInputChange ? (
+                      <input
+                        className="bg-white text-black border border-gray-300 px-3 py-1 w-full rounded-md"
+                        value={editedSlot.mid || ''}
+                        onChange={(e) =>
+                          handleInputChange('mid', e.target.value)
+                        }
+                      />
+                    ) : slot.mid ? (
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <span className="block max-w-[100px] truncate text-ellipsis overflow-hidden whitespace-nowrap cursor-pointer mx-auto">
+                            {slot.mid}
+                          </span>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content
+                            side="top"
+                            className="bg-black text-white p-2 rounded text-xs whitespace-pre-wrap max-w-[200px]"
+                            sideOffset={5}
+                          >
+                            {slot.mid}
                           </Tooltip.Content>
                         </Tooltip.Portal>
                       </Tooltip.Root>

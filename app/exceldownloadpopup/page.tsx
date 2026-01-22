@@ -234,30 +234,36 @@ const SlotList = () => {
 
 
        slots.forEach((slot) => {
-               const slotStartDate =  new Date(
-                                Math.max(
-                                  Math.min(
-                                    new Date(slot.endDate).getTime(),
-                                    isNaN(new Date(startDate).getTime()) ? new Date(Date.now() + 24 * 60 * 60 * 1000).getTime() : new Date(startDate).getTime()
-                                  ),
-                                  new Date(slot.startDate).getTime()
-                                )
-                              )
-
-        const maxEndDate = new Date(slot.endDate);
-
-        const slotEndDate =   new Date(
-                                Math.min(
-                                  new Date(slot.endDate).getTime(),
-                                  isNaN(new Date(endDate).getTime()) ? new Date(Date.now() + 24 * 60 * 60 * 1000).getTime() : new Date(endDate).getTime()
-                                )
-                              )
+        const slotStartTime = new Date(slot.startDate).getTime();
+        const slotEndTime = new Date(slot.endDate).getTime();
+        
+        let displayStartTime = slotStartTime;
+        let displayEndTime = slotEndTime;
+        
+        if (startDate) {
+          const rangeStartTime = new Date(startDate).getTime();
+          if (!isNaN(rangeStartTime)) {
+            displayStartTime = Math.max(slotStartTime, Math.min(slotEndTime, rangeStartTime));
+          }
+        }
+        
+        if (endDate) {
+          const rangeEndTime = new Date(endDate).getTime();
+          if (!isNaN(rangeEndTime)) {
+            displayEndTime = Math.min(slotEndTime, Math.max(displayStartTime, rangeEndTime));
+          }
+        } else {
+          if(startDate){
+            const tomorrow = new Date(displayStartTime).getTime() + (24 * 60 * 60 * 1000);
+            displayEndTime = Math.min(slotEndTime, tomorrow);
+          }
+        }
 
         const baseRow = {
           '타입': '리워드',
           '상품 링크': slot.singleLink ?? '',
-          '시작 날짜': slotStartDate,
-          '종료 날짜': slotEndDate,
+          '시작 날짜': formatDate(new Date(displayStartTime).toISOString()),
+          '종료 날짜': formatDate(new Date(displayEndTime).toISOString()),
           '검색어': slot.keyword ?? '',
           'MID': slot.mid ?? '',
         };
@@ -337,11 +343,12 @@ const SlotList = () => {
         });
 
         keywordWorkSheet['!cols'] = [
+          { wch: 15 },   // 타입
           { wch: 60 },   // 상품링크
-          { wch: 60 },   // 시작일
-          { wch: 60 },   // 종료일
-          { wch: 60 },   // 검색어
-          { wch: 60 },   // MID
+          { wch: 15 },   // 시작일
+          { wch: 15 },   // 종료일
+          { wch: 20 },   // 검색어
+          { wch: 30 },   // MID
         ];
 
         const now = new Date();
