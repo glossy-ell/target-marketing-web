@@ -151,6 +151,22 @@ const SlotList = () => {
   useEffect(() => {
     // 부모에게 준비 완료 신호
     window.opener?.postMessage('popup-ready', window.location.origin);
+    
+    // sessionStorage에서 데이터 복원 시도
+    try {
+      const savedData = sessionStorage.getItem('excelDownloadData');
+      if (savedData) {
+        const { targetSlot, selectedIds } = JSON.parse(savedData);
+        if (targetSlot && targetSlot.length > 0) {
+          setSlots(targetSlot);
+          setTargetSlot(targetSlot);
+          setSelectedIds(selectedIds || []);
+          setLoading(false);
+        }
+      }
+    } catch (err) {
+      console.error('sessionStorage 복원 실패:', err);
+    }
   }, []);
 
   useEffect(() => {
@@ -168,6 +184,13 @@ const SlotList = () => {
     setTargetSlot(targetSlot);
     setSelectedIds(selectedIds || []);
     setLoading(false);
+    
+    // sessionStorage에 데이터 저장
+    try {
+      sessionStorage.setItem('excelDownloadData', JSON.stringify({ targetSlot, selectedIds }));
+    } catch (err) {
+      console.error('sessionStorage 저장 실패:', err);
+    }
   };
 
   window.addEventListener('message', handleMessage);
@@ -335,19 +358,6 @@ const SlotList = () => {
 
   return (
     <div className="px-8 py-6 bg-white text-black min-h-screen rounded-lg shadow-lg">
-      <div className="mb-3 flex items-center gap-2 justify-between w-full">
-        {/* 왼쪽: 검색창 */}
-        <div className="flex items-center gap-2 w-[550px]">
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm whitespace-nowrap"
-            onClick={()=>{
-              excelDownload()
-            }}>
-            엑셀 다운로드
-          </button>
-        </div>
-      </div>
-
       <div className="mb-4 flex items-center gap-4">
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium">시작일:</label>
@@ -390,6 +400,14 @@ const SlotList = () => {
             placeholderText="종료일 선택"
           />
         </div>
+
+        <button
+          className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+          onClick={()=>{
+            excelDownload()
+          }}>
+          엑셀 다운로드
+        </button>
       </div>
 
       <SlotTable
@@ -404,6 +422,8 @@ const SlotList = () => {
         showActions={false}
         showCheckbox={false}
         showActionColumn={false}
+        dateRangeStart={startDate}
+        dateRangeEnd={endDate}
       />
     </div>
   );

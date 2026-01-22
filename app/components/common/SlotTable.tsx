@@ -51,6 +51,10 @@ interface SlotTableProps {
   // Optional props for table customization
   showCheckbox?: boolean;
   showActionColumn?: boolean;
+  
+  // Optional props for date range filtering (for excel pages)
+  dateRangeStart?: string;
+  dateRangeEnd?: string;
 }
 
 const SlotTable: React.FC<SlotTableProps> = ({
@@ -77,7 +81,44 @@ const SlotTable: React.FC<SlotTableProps> = ({
   rankingLoadingSlotSeq,
   showCheckbox = true,
   showActionColumn = true,
+  dateRangeStart,
+  dateRangeEnd,
 }) => {
+  // 날짜 범위에 맞춰 시작일/종료일 계산
+  const calculateDisplayDates = (slot: Slot) => {
+    const slotStartTime = new Date(slot.startDate).getTime();
+    const slotEndTime = new Date(slot.endDate).getTime();
+    
+    let displayStartTime = slotStartTime;
+    let displayEndTime = slotEndTime;
+    
+    if (dateRangeStart) {
+      const rangeStartTime = new Date(dateRangeStart).getTime();
+      if (!isNaN(rangeStartTime)) {
+        // 시작일은 슬롯 원래 시작일 이전으로 내려가지 않고, 슬롯 종료일보다 커질 수 없음
+        displayStartTime = Math.max(slotStartTime, Math.min(slotEndTime, rangeStartTime));
+      }
+    }
+    
+    if (dateRangeEnd) {
+      const rangeEndTime = new Date(dateRangeEnd).getTime();
+      if (!isNaN(rangeEndTime)) {
+        // 종료일은 슬롯 원래 종료일보다 커질 수 없고, 표시 시작일보다 작아질 수 없음
+        displayEndTime = Math.min(slotEndTime, Math.max(displayStartTime, rangeEndTime));
+      }
+    } else {
+      // 종료일이 없으면 기본값:  슬롯 시작일 다음날
+      if(dateRangeStart){
+        const tomorrow = new Date(displayStartTime).getTime() + (24 * 60 * 60 * 1000);
+        displayEndTime = Math.min(slotEndTime, tomorrow);
+      }
+    }
+    
+    return {
+      startDate: formatDate(new Date(displayStartTime).toISOString()),
+      endDate: formatDate(new Date(displayEndTime).toISOString())
+    };
+  };
   return (
     <div className="overflow-x-auto rounded-lg shadow-md">
       <table className="text-xs w-full text-center bg-white rounded-lg overflow-hidden border border-gray-200">
@@ -354,10 +395,10 @@ const SlotTable: React.FC<SlotTableProps> = ({
                 </Tooltip.Provider>
 
                 <td className="p-3 border-b border-gray-200 max-w-[50px]">
-                  {formatDate(slot.startDate)}
+                  {dateRangeStart || dateRangeEnd ? calculateDisplayDates(slot).startDate : formatDate(slot.startDate)}
                 </td>
                 <td className="p-3 border-b border-gray-200 max-w-[50px]">
-                  {formatDate(slot.endDate)}
+                  {dateRangeStart || dateRangeEnd ? calculateDisplayDates(slot).endDate : formatDate(slot.endDate)}
                 </td>
                 <Tooltip.Provider delayDuration={100}>
                   <td className="p-3 border-b border-gray-200 max-w-xs break-words">

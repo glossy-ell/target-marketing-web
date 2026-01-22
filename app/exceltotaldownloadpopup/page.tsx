@@ -133,6 +133,24 @@ const SlotList = () => {
   useEffect(() => {
     if (onceRef.current) return;
     onceRef.current = true;
+    
+    // sessionStorage에서 데이터 복원 시도
+    try {
+      const savedData = sessionStorage.getItem('excelTotalDownloadData');
+      if (savedData) {
+        const { targetSlot, selectedIds } = JSON.parse(savedData);
+        if (targetSlot && targetSlot.length > 0) {
+          setSlots(targetSlot);
+          setTargetSlot(targetSlot);
+          setSelectedIds(selectedIds || []);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.error('sessionStorage 복원 실패:', err);
+    }
+    
     window.opener?.postMessage('popup-ready', window.origin);
   const handleMessage = (event: MessageEvent) => {
 
@@ -154,6 +172,13 @@ const SlotList = () => {
     setSelectedIds(selectedKeywordIds);
 
     setLoading(false);
+    
+    // sessionStorage에 데이터 저장
+    try {
+      sessionStorage.setItem('excelTotalDownloadData', JSON.stringify({ targetSlot: targetSlots, selectedIds: selectedKeywordIds }));
+    } catch (err) {
+      console.error('sessionStorage 저장 실패:', err);
+    }
   };
 
   window.addEventListener('message', handleMessage);
@@ -358,38 +383,34 @@ const SlotList = () => {
 
           /> */}
           <ReactDatePicker
-            selected={startDate ? new Date(startDate.split(' ')[0]) : new Date(Date.now() + 24 * 60 * 60 * 1000)}  // 현재 startDate 값 반영
+            selected={startDate ? new Date(startDate.split(' ')[0]) : null}
             onChange={(date: Date | null) => {
               if (date) {
                 const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
                   .toString()
                   .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} 00:00:00.000`;
-                // if(new Date(formattedDate)> (isNaN(new Date(endDate).getTime()) ? new Date() : new Date(endDate)))
-                //   alert("시작일은 종료일보다 클 수 없습니다.");
-                // else
-                  setStartDate(formattedDate);
+                setStartDate(formattedDate);
               }
             }}
             dateFormat="yyyy-MM-dd"
-            className="border px-1 py-1 rounded text-lg font-semibold text-[#282828] w-[150px]"
+            className="border border-gray-300 rounded px-3 py-2 text-sm"
             locale={ko}
+            placeholderText="시작일 선택"
           />
           <ReactDatePicker
-            selected={endDate ? new Date(endDate.split(' ')[0]) : new Date(Date.now() + 24 * 60 * 60 * 1000)}
+            selected={endDate ? new Date(endDate.split(' ')[0]) : null}
             onChange={(date: Date | null) => {
               if (date) {
                 const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
                   .toString()
                   .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} 00:00:00.000`;
-                // if(new Date(formattedDate)< (isNaN(new Date(startDate).getTime()) ? new Date() : new Date(startDate)))
-                //   alert("시작일은 종료일보다 클 수 없습니다.");
-                // else
-                  setEndDate(formattedDate);
+                setEndDate(formattedDate);
               }
             }}
             dateFormat="yyyy-MM-dd"
-            className="border px-1 py-1 rounded text-lg font-semibold text-[#282828] w-[150px]"
+            className="border border-gray-300 rounded px-3 py-2 text-sm"
             locale={ko}
+            placeholderText="종료일 선택"
           />
         </div>
       </div>
@@ -421,6 +442,8 @@ const SlotList = () => {
               showActions={false}
               showCheckbox={false}
               showActionColumn={false}
+              dateRangeStart={startDate}
+              dateRangeEnd={endDate}
             />
           )}
 

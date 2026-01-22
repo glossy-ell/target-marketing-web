@@ -134,6 +134,24 @@ const SlotList = () => {
   useEffect(() => {
     if (onceRef.current) return;
     onceRef.current = true;
+    
+    // sessionStorage에서 데이터 복원 시도
+    try {
+      const savedData = sessionStorage.getItem('excelSpecDownloadData');
+      if (savedData) {
+        const { targetSlot, selectedIds } = JSON.parse(savedData);
+        if (targetSlot && targetSlot.length > 0) {
+          setSlots(targetSlot);
+          setTargetSlot(targetSlot);
+          setSelectedIds(selectedIds || []);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.error('sessionStorage 복원 실패:', err);
+    }
+    
     window.opener?.postMessage('popup-ready', window.origin);
   const handleMessage = (event: MessageEvent) => {
 
@@ -155,6 +173,13 @@ const SlotList = () => {
     setSelectedIds(selectedKeywordIds);
 
     setLoading(false);
+    
+    // sessionStorage에 데이터 저장
+    try {
+      sessionStorage.setItem('excelSpecDownloadData', JSON.stringify({ targetSlot: targetSlots, selectedIds: selectedKeywordIds }));
+    } catch (err) {
+      console.error('sessionStorage 저장 실패:', err);
+    }
   };
 
   window.addEventListener('message', handleMessage);
@@ -399,6 +424,8 @@ const SlotList = () => {
               showActions={false}
               showCheckbox={false}
               showActionColumn={false}
+              dateRangeStart={startDate}
+              dateRangeEnd={endDate}
             />
           )}
 

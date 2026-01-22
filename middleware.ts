@@ -9,31 +9,50 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const loginPage = '/';
-  const protectedPaths = ['/slot-management', 'add-slot', '/user-management', '/log'];
-
-  if (!token) {
-    if (protectedPaths.some(path => pathname.startsWith(path))) {
-      return NextResponse.redirect(new URL(loginPage, request.url));
-    }
+  
+  // API 라우트는 제외
+  if (pathname.startsWith('/api')) {
     return NextResponse.next();
   }
 
-  try {
-    await jwtVerify(token, secret);
-  } catch (e) {
-    if (protectedPaths.some(path => pathname.startsWith(path))) {
+  // 로그인 페이지가 아닌 모든 페이지는 인증 필요
+  if (pathname !== loginPage) {
+    if (!token) {
       return NextResponse.redirect(new URL(loginPage, request.url));
     }
-    return NextResponse.next();
+
+    try {
+      await jwtVerify(token, secret);
+    } catch (e) {
+      return NextResponse.redirect(new URL(loginPage, request.url));
+    }
   }
 
-  if (pathname === loginPage) {
-    return NextResponse.redirect(new URL('/slot-management', request.url));
+  // 이미 로그인된 사용자가 로그인 페이지에 접근하면 slot-management로 리다이렉트
+  if (pathname === loginPage && token) {
+    try {
+      await jwtVerify(token, secret);
+      return NextResponse.redirect(new URL('/slot-management', request.url));
+    } catch (e) {
+      // 토큰이 유효하지 않으면 로그인 페이지 표시
+      return NextResponse.next();
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/', '/slot-management/:path*', '/add-slot/:path*', '/user-management/:path*', '/log/:path*'],
+  matcher: [
+    '/',
+    '/slot-management/:path*',
+    '/add-slot/:path*',
+    '/user-management/:path*',
+    '/log/:path*',
+    '/extend-management/:path*',
+    '/exceldownloadpopup/:path*',
+    '/excelspecdownloadpopup/:path*',
+    '/exceltotaldownloadpopup/:path*',
+    '/exceluploadpopup/:path*',
+  ],
 };
