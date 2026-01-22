@@ -18,7 +18,6 @@ interface User {
   distributorId: string | null;
   distributorSeq: number | null;
   excelAllow: boolean;
-  additionalRegAllow: boolean;
   slotAllow: boolean;
   userAllow: boolean;
   rankingCheckAllow: boolean;
@@ -29,13 +28,25 @@ interface User {
   price: number;
 }
 
+interface Agency {
+  seq: number;
+  id: string;
+  name: string;
+}
+
+interface Distributor {
+  seq: number;
+  id: string;
+  name: string;
+}
+
 const UserList = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [currentUser, setCurrentUser] = useState<{ id: string; seq: number; role: number; excelAllow:number; additionalRegAllow:number; slotAllow:number; userAllow: number; rankingCheckAllow: number;} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; seq: number; role: number; excelAllow:number;  slotAllow:number; userAllow: number; rankingCheckAllow: number;} | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [agencyList, setAgencyList] = useState([]);
-  const [distributorList, setDistributorList] = useState([]);
+  const [agencyList, setAgencyList] = useState<Agency[]>([]);
+  const [distributorList, setDistributorList] = useState<Distributor[]>([]);
   const [page, setPage] = useState(1);
 
 
@@ -52,7 +63,6 @@ const UserList = () => {
     role: 3,
     agencySeq: '',       // ← 여기가 현재 상태의 필드
     distributorSeq: '',  // ← 여기도
-    additionalRegAllow: 0,
     seq: 0,
     excelAllow: 0,
     slotAllow: 0,
@@ -183,7 +193,7 @@ const UserList = () => {
         const res = await fetch('/api/me', { credentials: 'include' });
         if (!res.ok) throw new Error('로그인 정보 확인 실패');
         const user = await res.json();
-        setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow), additionalRegAllow:  Number(user.additionalRegAllow), slotAllow: Number(user.slotAllow),userAllow:Number(user.userAllow),rankingCheckAllow:Number(user.rankingCheckAllow)});
+        setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow), slotAllow: Number(user.slotAllow),userAllow:Number(user.userAllow),rankingCheckAllow:Number(user.rankingCheckAllow)});
       } catch (err) {
         setError('로그인 정보가 없습니다.');
         window.location.href = '/';
@@ -217,7 +227,7 @@ const UserList = () => {
   }, [currentUser]);
 
   useEffect(() => {
-    // 대행사 목록 불러오기
+    // 대행 목록 불러오기
     fetch('/api/users/agencies')
       .then((res) => res.json())
       .then((data) => setAgencyList(data));
@@ -230,7 +240,7 @@ const UserList = () => {
 
 
  useEffect(() => {
-    // 대행사 목록 불러오기
+    // 대행 목록 불러오기
     if(formData.distributorSeq != '' && !isNaN(Number(formData.distributorSeq))){
     fetch(`/api/users/agencies?seq=${formData.distributorSeq}`)
       .then((res) => res.json())
@@ -293,8 +303,8 @@ const UserList = () => {
     switch (role) {
       case 0: return '관리자';
       case 1: return '총판';
-      case 2: return '대행사';
-      case 3: return '사용자';
+      case 2: return '대행';
+      case 3: return '클라이언트';
       default: return '알 수 없음';
     }
   };
@@ -312,10 +322,7 @@ const UserList = () => {
       setFormData((prev) => ({ ...prev, excelAllow: checked ? 1 : 0 }));
       return; // 기존 로직 실행 안 하도록 종료
     }
-    if (name === 'additionalRegAllow') {
-      setFormData((prev) => ({ ...prev, additionalRegAllow: checked ? 1 : 0 }));
-      return; // 기존 로직 실행 안 하도록 종료
-    }
+
     if (name === 'slotAllow') {
       setFormData((prev) => ({ ...prev, slotAllow: checked ? 1 : 0 }));
       return; // 기존 로직 실행 안 하도록 종료
@@ -381,7 +388,6 @@ const UserList = () => {
               ? formData.role
               : targetUser.role,
             excelAllow: formData.excelAllow,
-            additionalRegAllow: formData.additionalRegAllow,
             userAllow: formData.userAllow,
             slotAllow: formData.slotAllow,
             rankingCheckAllow: formData.rankingCheckAllow,
@@ -416,7 +422,6 @@ const UserList = () => {
       password: '',
       role: user.role,
       excelAllow: user.excelAllow == true ? 1:0,
-      additionalRegAllow: user.additionalRegAllow == true ? 1:0,
       slotAllow : user.slotAllow == true ? 1:0,
       userAllow : user.userAllow == true ? 1:0,
       rankingCheckAllow : user.rankingCheckAllow == true ? 1:0,
@@ -512,8 +517,8 @@ const UserList = () => {
           >
             <option value={0} style={{ display: (currentUser!.role == 0 ) ? '' : 'none' }}>관리자</option>
             <option value={1} style={{ display: (currentUser!.role == 0 ) ? '' : 'none' }}>총판</option>
-            <option value={2} style={{ display: (currentUser!.role == 0 || currentUser!.role == 1) ? '' : 'none' }}>대행사</option>
-            <option value={3}>사용자</option>
+            <option value={2} style={{ display: (currentUser!.role == 0 || currentUser!.role == 1) ? '' : 'none' }}>대행</option>
+            <option value={3}>클라이언트</option>
           </select>
 
           {/* 총판 선택 */}
@@ -572,13 +577,13 @@ const UserList = () => {
           )}
 
 
-          {/* 대행사 선택 */}
+          {/* 대행 선택 */}
           {(currentUser?.role === 0 || currentUser?.role === 1) && formData.role == 3 && (
             <div className="relative" ref={agencyDropdownRef}>
               <input
                 type="text"
                 className="w-full p-2 border rounded"
-                placeholder="대행사 이름 또는 ID로 검색"
+                placeholder="대행 이름 또는 ID로 검색"
                 value={agencySearchTerm}
                 onChange={(e) => {
                   setAgencySearchTerm(e.target.value);
@@ -641,18 +646,7 @@ const UserList = () => {
               </label>
             ):null}
 
-            {currentUser?.role === 0 ? (
-               <label className="inline-flex gap-1 cursor-pointer">
-                <span>추가등록 허용 </span>
-                <input
-                  type="checkbox"
-                  name="additionalRegAllow"
-                  checked={formData.additionalRegAllow ===1 }
-                  onChange={handleInputChange}
-                  className="border p-2 cursor-pointer accent-[#282828]"
-                />
-              </label>
-            ):null}
+         
 
             {currentUser?.role === 0 ? (
                <label className="inline-flex gap-1 cursor-pointer">
@@ -685,7 +679,7 @@ const UserList = () => {
 
             {currentUser?.role === 0 ? (
               <label   className="inline-flex gap-1 cursor-pointer"  style={{ display: (currentUser?.role === 0 && formData.role !=3 )   ? '' : 'none' }}  >
-              <span>사용자 추가 허용 </span>
+              <span>계정 추가 허용 </span>
               <input
 
                 type="checkbox"
@@ -724,7 +718,6 @@ const UserList = () => {
                   role: 3,
                   agencySeq: '',
                   excelAllow: 0,
-                  additionalRegAllow: 0,
                   slotAllow:0,
                   userAllow:0,
                   rankingCheckAllow:0,
@@ -777,7 +770,7 @@ const UserList = () => {
               <th className="px-5 py-4 border-b border-gray-300">번호</th>
               <th className="px-5 py-4 border-b border-gray-300">역할</th>
               <th className="px-5 py-4 border-b border-gray-300">총판</th>
-              <th className="px-5 py-4 border-b border-gray-300">대행사</th>
+              <th className="px-5 py-4 border-b border-gray-300">대행</th>
               <th className="px-5 py-4 border-b border-gray-300">아이디</th>
               <th className="px-5 py-4 border-b border-gray-300">이름</th>
               <th className="px-5 py-4 border-b border-gray-300"
@@ -799,7 +792,7 @@ const UserList = () => {
                 <td className="border p-2"   style={{ display: currentUser?.role === 0  ? '' : 'none' }}>
                   {user.userAllow==true && (
                     <span className="bg-red-500 text-white text-sm px-3 py-1 rounded-full">
-                      사용자
+                      계정
                     </span>
                   )}
                   {user.slotAllow==true && (
@@ -812,11 +805,7 @@ const UserList = () => {
                       엑셀
                     </span>
                   )}
-                  {user.additionalRegAllow==true && (
-                    <span className="bg-green-500 text-white text-sm px-3 py-1 rounded-full">
-                      추가등록
-                    </span>
-                  )}
+    
                   {user.rankingCheckAllow==true && (
                     <span className="bg-[#282828] text-white text-sm px-3 py-1 rounded-full">
                       순위체크

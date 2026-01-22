@@ -41,7 +41,6 @@ export async function GET() {
             u.role, 
             u.createdAt,
             u.excelAllow,
-            u.additionalRegAllow,
             u.slotAllow,
             u.userAllow,
             u.rankingCheckAllow,
@@ -73,7 +72,6 @@ export async function GET() {
           u.role, 
           u.createdAt,
           u.excelAllow,
-          u.additionalRegAllow,
           u.slotAllow,
           u.userAllow,
           u.rankingCheckAllow,
@@ -106,7 +104,6 @@ export async function GET() {
           u.role, 
           u.createdAt,
           u.excelAllow,
-          u.additionalRegAllow,
           u.slotAllow,
           u.userAllow,
           u.rankingCheckAllow,
@@ -139,7 +136,6 @@ export async function GET() {
             u.role, 
             u.createdAt,
             u.excelAllow,
-            u.additionalRegAllow,
             u.slotAllow,
             u.userAllow,
             u.rankingCheckAllow,
@@ -181,7 +177,6 @@ export async function POST(request: Request) {
       role,
       creatorSeq,
       excelAllow,
-      additionalRegAllow,
       rankingCheckAllow,
       slotAllow,
       userAllow,
@@ -217,21 +212,21 @@ export async function POST(request: Request) {
       agencyId = agencySeq || null;
       distributorId = distributorSeq || null;
     } else if (creator.role === 1) {
-      // 총판(distributor) → 대행사(2), 사용자(3) 생성 가능
+      // 총판(distributor) → 대행(2), 클라이언트(3) 생성 가능
 
 
       if (role === 2 || role === 3) {
         distributorId = creator.seq; // ✅ 총판이면 distributorId에만 넣는다
         agencyId = agencySeq || null;
       } else {
-        return NextResponse.json({ error: '총판은 대행사 또는 사용자만 생성 가능합니다.' }, { status: 403 });
+        return NextResponse.json({ error: '총판은 대행 또는 사용자만 생성 가능합니다.' }, { status: 403 });
       }
     } else if (creator.role === 2) {
-      // 대행사(agency) → 사용자만 생성 가능
+      // 대행(agency) → 클라이언트만 생성 가능
       if (role === 3) {
         agencyId = creator.seq;
     
-        // ✅ 대행사이 소속된 총판의 seq를 조회
+        // ✅ 대행이 소속된 총판의 seq를 조회
         const [agencyRows] = await pool.query<mysql.RowDataPacket[]>(
           `SELECT distributorId FROM \`User\` WHERE seq = ? AND isDeleted = 0`,
           [creator.seq]
@@ -241,7 +236,7 @@ export async function POST(request: Request) {
           distributorId = agencyRows[0].distributorId ?? null;
         }
       } else {
-        return NextResponse.json({ error: '대행사는 사용자만 생성 가능합니다.' }, { status: 403 });
+        return NextResponse.json({ error: '대행은 클라이언트만 생성 가능합니다.' }, { status: 403 });
       }
     } else {
       return NextResponse.json({ error: '해당 권한으로는 유저를 생성할 수 없습니다.' }, { status: 403 });
@@ -249,10 +244,10 @@ export async function POST(request: Request) {
     
     // 유저 추가
     const query = `
-      INSERT INTO \`User\` (id, name, password, role, agencyId, distributorId,excelAllow,additionalRegAllow,rankingCheckAllow,slotAllow,userAllow,price)
-      VALUES (?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
+      INSERT INTO \`User\` (id, name, password, role, agencyId, distributorId,excelAllow,rankingCheckAllow,slotAllow,userAllow,price)
+      VALUES (?, ?, ?, ?, ?, ?,?,?,?,?,?)
     `;
-    const params = [id, name, hashedPassword, role, agencyId, distributorId,excelAllow,additionalRegAllow,rankingCheckAllow,slotAllow,userAllow,price];
+    const params = [id, name, hashedPassword, role, agencyId, distributorId,excelAllow,rankingCheckAllow,slotAllow,userAllow,price];
 
     await pool.query(query, params);
     return NextResponse.json({ message: '유저가 성공적으로 추가되었습니다.' });

@@ -15,25 +15,11 @@ interface Extend {
   userId: string;
   agencyId: string;
   distributorId: string;
-  productLink: string;
   keyword: string;
   startDate: string;
   endDate: string;
-  productId: string | null;
-  vendorId: string | null;
-  thumbnail: string;
   rank: number;
   memo: string;
-  sortation : number;
-  secretKey1 : string;
-  secretKey2 : string;
-  secretKey3 : string;
-  secretKey4 : string;
-  secretLandingKey1 : string;
-  secretLandingKey2 : string;
-  secretLandingKey3 : string;
-  secretLandingKey4 : string;
-  status: boolean;
 }
 
 
@@ -74,7 +60,7 @@ const ExtendList = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentUser, setCurrentUser] = useState<{ id: string; seq: number; role: number; excelAllow:number; additionalRegAllow:number;} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; seq: number; role: number; excelAllow:number;} | null>(null);
 
   const [time, setTime] = useState<{ open_start_time: string; open_end_time: string; edit_start_time: string; edit_end_time:string;} | null>(null);
 
@@ -126,8 +112,8 @@ const ExtendList = () => {
         const res = await fetch('/api/me', { credentials: 'include' });
         if (!res.ok) throw new Error('로그인 정보 확인 실패');
         const user = await res.json();
-        setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow), additionalRegAllow:  Number(user.additionalRegAllow)});
-
+        setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow)});
+        
         if (user.role != 0) {
           router.replace('slot-management');
         }
@@ -603,16 +589,13 @@ const ExtendList = () => {
                     )}
 
                     {(isAdmin || isDistributor) && (
-                      <th className="px-5 py-4 border-b border-gray-300">대행사 ID</th>
+                      <th className="px-5 py-4 border-b border-gray-300">대행 ID</th>
                     )}
-                    {/* <th className="px-5 py-4 border-b border-gray-300">구분</th>
-                    <th className="px-5 py-4 border-b border-gray-300">상태</th>
-                    <th className="px-5 py-4 border-b border-gray-300">추가등록</th> */}
+                 
+              
 
                     <th className="px-5 py-4 border-b border-gray-300">사용자 ID</th>
-                    <th className="px-5 py-4 border-b border-gray-300">썸네일</th>
                     <th className="px-5 py-4 border-b border-gray-300">키워드</th>
-                    <th className="px-5 py-4 border-b border-gray-300">원부 링크</th>
                     <th className="px-5 py-4 border-b border-gray-300">시작일</th>
                     <th className="px-5 py-4 border-b border-gray-300">종료일</th>
                     <th className="px-5 py-4 border-b border-gray-300">연장요청일</th>
@@ -658,77 +641,10 @@ const ExtendList = () => {
                           </td>
                         )}
 
-                        {/* {isEditing ? (
-                            <td className="p-3 border-b border-gray-200 max-w-xs break-words">
-                              <select name=""
-                                value={editedSlot.sortation || ''}
-                               onChange={(e) =>
-                                handleSortationChange('sortation', e.target.value)
-                              }
-                              id="sortation"
-                              >
-                                <option value="0">구분 선택</option>
-                                <option value="1">키워드</option>
-                                <option value="2">랜딩</option>
-                              </select>
-                            </td>
-                          ) : (
-                            <td className="p-3 border-b border-gray-200 max-w-xs break-words">
-                              <span className="whitespace-nowrap">
-                                {slot.sortation === 1
-                                  ? "키워드"
-                                  : slot.sortation === 2
-                                  ? "랜딩"
-                                  : "-"}
-                              </span>
-                            </td>
-                          )} */}
-
-                        {/* <td className="p-3 border-b border-gray-200 max-w-xs break-words">
-                          <div className="flex items-center gap-2">
-                            <div
-                              className={`w-2.5 h-2.5 rounded-full ${
-                                slot.status ? 'bg-green-500' : 'bg-red-500'
-                              }`}
-                            ></div>
-                            <span className={slot.status ? 'text-green-600' : 'text-red-600'}>
-                              {slot.status ? '정상' : '오류'}
-                            </span>
-                          </div>
-                       </td> */}
-                        {/* <td className="p-3 border-b border-gray-200 max-w-xs break-words">
-                          <Button
-                              style={{
-                                display: isEditing
-                                  ? 'none'
-                                  : currentUser && currentUser.additionalRegAllow === 1
-                                  ? ''
-                                  : 'none'
-                              }}
-                              className="bg-[#282828] hover:bg-[#141414] text-white px-3 py-1 rounded-md"
-                              onClick={() => {
-                                setSelectedModalSlot(slot);
-                                setAdditionalModalOpen(true);
-                              }
-                              }>
-                              추가등록
-                          </Button>
-                        </td> */}
-
                         <td className="p-3 border-b border-gray-200 max-w-xs break-words">
                           {extend.userId}
                         </td>
-                        <td className="p-3 border-b border-gray-200 max-w-xs break-words">
-                          {extend.thumbnail ? (
-                            <img
-                              src={extend.thumbnail}
-                              alt="썸네일"
-                              className="w-16 h-16 object-cover rounded"
-                            />
-                          ) : (
-                            '-'
-                          )}
-                        </td>
+                      
                         <td className="p-3 border-b border-gray-200 max-w-[120px]">
                           <>
                             <div className="flex flex-col">
@@ -752,38 +668,6 @@ const ExtendList = () => {
                             </div>
                           </>
                         </td>
-                        <Tooltip.Provider delayDuration={100}>
-                          <td className="p-3 border-b border-gray-200 max-w-xs break-words">
-                            {extend.productLink ? (
-                              <Tooltip.Root>
-                                <Tooltip.Trigger asChild>
-                                  <a
-                                    href={extend.productLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-gray-700 hover:underline truncate inline-block max-w-[200px] cursor-pointer"
-                                  >
-                                    {extend.productLink}
-                                  </a>
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content
-                                    side="top"
-                                    className="bg-black text-white p-2 rounded text-xs whitespace-pre-wrap max-w-[300px]"
-                                    sideOffset={5}
-                                  >
-                                    {extend.productLink}
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                            ) : (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </td>
-                        </Tooltip.Provider>
-
-
-
                         <td className="p-3 border-b border-gray-200">
                           {formatDate(extend.startDate)}
                         </td>

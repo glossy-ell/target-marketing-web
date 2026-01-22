@@ -142,7 +142,7 @@ export async function DELETE(request: Request) {
    
 
       const logQuery = `
-      INSERT INTO Log (type,created_at,refund_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,keywordLimit,refundPrice,refundPriceAgency,refundPriceUser)
+      INSERT INTO Log (type,created_at,refund_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,refundPrice,refundPriceAgency,refundPriceUser)
       VALUES ?
       `; // 로그 추가 
       const logValues =  [[
@@ -156,7 +156,6 @@ export async function DELETE(request: Request) {
         targetSlot.startDate,
         targetSlot.endDate,
         adjustmentDay,
-        targetSlot.keywordLimit,
         refundPrice,
         refundPriceAgency,
         refundPriceUser
@@ -171,12 +170,7 @@ export async function DELETE(request: Request) {
       WHERE keyword = ?
     `;
       const sqlParams = [targetSlot.keyword];
-      if (targetSlot.productLink === null || targetSlot.productLink === undefined) {
-        query += ' AND productLink IS NULL';
-      } else {
-        query += ' AND productLink = ?';
-        sqlParams.push(targetSlot.productLink);
-      }
+   
 
       // singleLink 처리
       if (targetSlot.singleLink === null || targetSlot.singleLink === undefined) {
@@ -300,7 +294,6 @@ export async function DELETE(request: Request) {
           slot.startDate,
           slot.endDate,
           adjustmentDay,
-          slot.keywordLimit,
           refundPrice,
           refundPriceAgency,
           refundPriceUser
@@ -313,7 +306,7 @@ export async function DELETE(request: Request) {
    
 
       const logQuery = `
-        INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,keywordLimit,refundPrice,refundPriceAgency,refundPriceUser)
+        INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,refundPrice,refundPriceAgency,refundPriceUser)
         VALUES ?
       `;
        await pool.query(logQuery, [logValues]);
@@ -326,14 +319,8 @@ export async function DELETE(request: Request) {
         `;
         const sqlParams = [targetSlot.keyword];
 
-        // productLink 조건 처리
-        if (targetSlot.productLink === null || targetSlot.productLink === undefined) {
-          query += ' AND productLink IS NULL';
-        } else {
-          query += ' AND productLink = ?';
-          sqlParams.push(targetSlot.productLink);
-        }
 
+ 
         // singleLink 조건 처리
         if (targetSlot.singleLink === null || targetSlot.singleLink === undefined) {
           query += ' AND singleLink IS NULL';

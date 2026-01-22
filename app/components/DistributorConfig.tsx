@@ -13,7 +13,6 @@ interface User {
   distributorId: string | null;
   distributorSeq: number | null;
   excelAllow: boolean;
-  additionalRegAllow: boolean;
   slotAllow: boolean;
   userAllow: boolean;
   rankingCheckAllow: boolean;
@@ -34,7 +33,7 @@ export default function DistributorConfig(props: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<{ id: string; seq: number; role: number; excelAllow:number; additionalRegAllow:number; slotAllow:number; userAllow: number;rankingCheckAllow:number} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; seq: number; role: number; excelAllow:number;  slotAllow:number; userAllow: number;rankingCheckAllow:number} | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [page, setPage] = useState(1);
@@ -53,7 +52,7 @@ export default function DistributorConfig(props: Props) {
          const res = await fetch('/api/me', { credentials: 'include' });
          if (!res.ok) throw new Error('로그인 정보 확인 실패');
          const user = await res.json();
-         setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow), additionalRegAllow:  Number(user.additionalRegAllow), slotAllow: Number(user.slotAllow),userAllow:Number(user.userAllow),rankingCheckAllow:Number(user.rankingCheckAllow)});
+         setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow), slotAllow: Number(user.slotAllow),userAllow:Number(user.userAllow),rankingCheckAllow:Number(user.rankingCheckAllow)});
        } catch (err) {
          setError('로그인 정보가 없습니다.');
        }
@@ -149,7 +148,7 @@ export default function DistributorConfig(props: Props) {
     switch (role) {
       case 0: return '관리자';
       case 1: return '총판';
-      case 2: return '대행사';
+      case 2: return '대행';
       case 3: return '사용자';
       default: return '알 수 없음';
     }
@@ -179,13 +178,7 @@ export default function DistributorConfig(props: Props) {
     setExcelLocalSwitchState(initialState);
   }, [users]);
 
-  useEffect(() => {
-    const initialState: { [key: number]: boolean } = {};
-    users.forEach(user => {
-      initialState[user.seq] = user.additionalRegAllow;
-    });
-    setRegLocalSwitchState(initialState);
-  }, [users]);
+
 
   useEffect(() => {
     const initialState: { [key: number]: boolean } = {};
@@ -249,16 +242,15 @@ export default function DistributorConfig(props: Props) {
               <th className="px-5 py-4 border-b border-gray-300">번호</th>
               <th className="px-5 py-4 border-b border-gray-300">역할</th>
               <th className="px-5 py-4 border-b border-gray-300">총판</th>
-              <th className="px-5 py-4 border-b border-gray-300">대행사</th>
+              <th className="px-5 py-4 border-b border-gray-300">대행</th>
               <th className="px-5 py-4 border-b border-gray-300">아이디</th>
               <th className="px-5 py-4 border-b border-gray-300">이름</th>
               <th className="px-5 py-4 border-b border-gray-300">슬롯 오픈</th>
               <th className="px-5 py-4 border-b border-gray-300">사용자 추가</th>
               <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>엑셀 허용</th>
-              <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>추가등록 허용</th>
               <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>순위조회 허용</th>
               <th className="px-5 py-4 border-b border-gray-300">단가</th>
-              <th className="px-5 py-4 border-b border-gray-300">전체 대행사</th>
+              <th className="px-5 py-4 border-b border-gray-300">전체 </th>
               <th className="px-5 py-4 border-b border-gray-300">전체 사용자</th>
               <th className="px-5 py-4 border-b border-gray-300">슬롯 합계</th>
             </tr>
@@ -327,24 +319,7 @@ export default function DistributorConfig(props: Props) {
                   </label>
                 </td>
 
-                <td className="border p-2" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>
-                  <label className="relative inline-block w-10 h-5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={regLocalSwitchState[user.seq] || false}
-                      onChange={(e) => {
-                        setRegLocalSwitchState((prev) => ({
-                          ...prev,
-                          [user.seq]: !prev[user.seq],
-                        }));
-                        handleChangeRole(user.seq, e.target.checked, "additionalRegAllow");
-                      }}
-                    />
-                    <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#282828] transition-colors duration-200"></div>
-                    <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 peer-checked:translate-x-5"></div>
-                  </label>
-                </td>
+            
 
                 <td className="border p-2" style={{ display: currentUser?.role === 0  ? '' : 'none' }} >
                   <label className="relative inline-block w-10 h-5 cursor-pointer">

@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `Slot` ADD COLUMN `impressions` INTEGER NOT NULL DEFAULT 0;

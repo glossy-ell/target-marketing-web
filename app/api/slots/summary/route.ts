@@ -46,191 +46,44 @@ export async function GET() {
         COUNT(CASE WHEN s.endDate < CURDATE() THEN 1 END) AS expired,
         COUNT(
             CASE
-              WHEN s.status = false
-                  AND s.rank IS NULL
+              WHEN s.rank IS NULL
                   AND NOT (
-                    (singleLink IS NOT NULL AND singleLink LIKE '%.brand%')
-                    AND productLink IS NULL
+                    (s.singleLink IS NOT NULL )
                   )
               THEN 1
             END
           )AS waiting,
           COUNT(CASE 
             WHEN DATE_SUB(s.startDate, INTERVAL 1 DAY) <= CURDATE() 
-             AND s.endDate >= CURDATE()  AND s.status = true AND NOT 
-            (
-              s.sortation = 0
-              OR (
-                  s.keywordLimit = 4
-                  AND (
-                      (s.sortation = 2 AND (
-                          s.secretLandingKey1 IS NULL
-                          OR s.secretLandingKey2 IS NULL
-                          OR s.secretLandingKey3 IS NULL
-                          OR s.secretLandingKey4 IS NULL
-                      ))
-                      OR
-                      (s.sortation = 1 AND (
-                          s.secretKey1 IS NULL
-                          OR s.secretKey2 IS NULL
-                          OR s.secretKey3 IS NULL
-                          OR s.secretKey4 IS NULL
-                      ))
-                  )
-              )
-              OR (
-                  s.keywordLimit = 3
-                  AND (
-                      (s.sortation = 2 AND (
-                          s.secretLandingKey1 IS NULL
-                          OR s.secretLandingKey2 IS NULL
-                          OR s.secretLandingKey3 IS NULL
-                      ))
-                      OR
-                      (s.sortation = 1 AND (
-                          s.secretKey1 IS NULL
-                          OR s.secretKey2 IS NULL
-                          OR s.secretKey3 IS NULL
-                      ))
-                  )
-              )
-              OR (
-                  s.keywordLimit = 2
-                  AND (
-                      (s.sortation = 2 AND (
-                          s.secretLandingKey1 IS NULL
-                          OR s.secretLandingKey2 IS NULL
-                      ))
-                      OR
-                      (s.sortation = 1 AND (
-                          s.secretKey1 IS NULL
-                          OR s.secretKey2 IS NULL
-                      ))
-                  )
-              )
-              OR (
-                  s.keywordLimit = 1
-                  AND (
-                      (s.sortation = 2 AND (
-                          s.secretLandingKey1 IS NULL
-                      ))
-                      OR
-                      (s.sortation = 1 AND (
-                          s.secretKey1 IS NULL
-                      ))
-                  )
-              )
-          )
+             AND s.endDate >= CURDATE()
+             AND s.keyword IS NOT NULL AND s.keyword <> ''
+             AND s.singleLink IS NOT NULL AND s.singleLink <> ''
+             AND s.mid IS NOT NULL AND s.mid <> ''
+             AND sr.seq IS NOT NULL
          THEN 1 
           END) AS active,
       
           COUNT(
             CASE 
-                WHEN s.endDate >= CURDATE() AND ( s.status = false OR s.sortation = 0 OR COALESCE(s.productPrice, 0) <= 0 
-                
-                        OR s.thumbnail IS NULL
-                        OR s.thumbnail = ''
-                        OR s.productPrice IS NULL 
-                        OR s.productPrice = 0
-                        OR s.answerTagList IS NULL 
-                        OR s.storeName IS NULL 
-                        OR s.productId IS NULL
-                        OR (
-                          COALESCE(TRIM(s.productLink), '') <> '' 
-                          AND (
-                            COALESCE(s.comparePriceLowestPrice, 0) <= 0
-                            OR COALESCE(s.comparePriceURL, '') = ''
-                            OR COALESCE(s.comparePriceSalePlaceCount, 0) <= 0
-                          )
-                        )
-
-                    OR
-                    (
-                      (
-                        COALESCE(s.comparePriceLowestPrice, 0) <= 0 OR
-                        COALESCE(s.comparePriceSalePlaceCount, 0) <= 0 
-                      ) AND COALESCE(TRIM(productLink), '') <> ''
-
-                    )OR
-                    (
-                      s.keywordLimit = 4 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                                  OR s.secretLandingKey3 IS NULL
-                                  OR s.secretLandingKey4 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-                                  OR s.secretKey3 IS NULL
-                                  OR s.secretKey4 IS NULL
-                              )
-                            )
-                          ) OR 
-                      s.keywordLimit = 3 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                                  OR s.secretLandingKey3 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-                                  OR s.secretKey3 IS NULL
-                              )
-                            )
-                          ) OR
-                      s.keywordLimit = 2 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-
-                              )
-                            )
-                          )OR
-
-                          s.keywordLimit = 1 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                              )
-                            )
-                          )
-                    )
+              WHEN s.endDate >= CURDATE() AND 
+                (
+                  s.keyword IS NULL OR s.keyword = ''
+                  OR s.singleLink IS NULL OR s.singleLink = ''
+                  OR s.mid IS NULL OR s.mid = ''
+                  OR sr.seq IS NULL
                 )
-                THEN 1 
+              THEN 1 
             END
         ) AS error,
         COUNT(CASE WHEN s.endDate = CURDATE() THEN 1 END) AS closingToday
       FROM Slot s
       LEFT JOIN \`User\` u ON s.userId = u.seq
+      LEFT JOIN (
+        SELECT keyword, singleLink, MAX(seq) as seq
+        FROM slot_ranking
+        WHERE DATE(created) = CURDATE()
+        GROUP BY keyword, singleLink
+      ) sr ON s.keyword = sr.keyword AND s.singleLink = sr.singleLink
       ${where}
     `,
       params

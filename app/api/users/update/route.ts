@@ -19,10 +19,10 @@ async function getCurrentUser() {
   }
 }
 
-// ✅ 총판 및 대행사 수정 API
+// ✅총판 및 대행 수정 API
 export async function PUT(request: Request) {
   try {
-    let { userSeq, agencySeq, distributorSeq,name,editorSeq,password,role,excelAllow,additionalRegAllow,userAllow,slotAllow,rankingCheckAllow,price} = await request.json();
+    let { userSeq, agencySeq, distributorSeq,name,editorSeq,password,role,excelAllow,userAllow,slotAllow,rankingCheckAllow,price} = await request.json();
 
     const currentUser = await getCurrentUser();
     if (!currentUser) {
@@ -62,13 +62,12 @@ export async function PUT(request: Request) {
     if (editor.role === 0) {
       if (typeof role === 'number' && !isNaN(role)) {
         await pool.query(
-          'UPDATE `User` SET agencyId = ?, distributorId = ?, role = ?,excelAllow =?,additionalRegAllow=?,userAllow=?,slotAllow=?,rankingCheckAllow=?,price=? WHERE seq = ?',
+          'UPDATE `User` SET agencyId = ?, distributorId = ?, role = ?,excelAllow =?,userAllow=?,slotAllow=?,rankingCheckAllow=?,price=? WHERE seq = ?',
           [
             typeof agencySeq === 'number' ? agencySeq : null,
             typeof distributorSeq === 'number' ? distributorSeq : null,
             role,
             excelAllow,
-            additionalRegAllow,
             userAllow,
             slotAllow,
             rankingCheckAllow,
@@ -78,12 +77,11 @@ export async function PUT(request: Request) {
         );
       }else{
       await pool.query(
-          'UPDATE `User` SET agencyId = ?, distributorId = ?,excelAllow =?,additionalRegAllow=?,userAllow=?,slotAllow=?,rankingCheckAllow=?,price=? WHERE seq = ?',
+          'UPDATE `User` SET agencyId = ?, distributorId = ?,excelAllow =?,userAllow=?,slotAllow=?,rankingCheckAllow=?,price=? WHERE seq = ?',
           [
             typeof agencySeq === 'number' ? agencySeq: null,
             typeof distributorSeq === 'number' ? distributorSeq : null,
             excelAllow,
-            additionalRegAllow,
             userAllow,
             slotAllow,
             rankingCheckAllow,
@@ -111,12 +109,11 @@ export async function PUT(request: Request) {
 
       if (typeof role === 'number' && !isNaN(role)) {
           await pool.query(
-          'UPDATE `User` SET distributorId = ?,role = ?,excelAllow =?,additionalRegAllow =?,userAllow=?,slotAllow=?,rankingCheckAllow=? ,price=?WHERE seq = ?',
+          'UPDATE `User` SET distributorId = ?,role = ?,excelAllow =?,userAllow=?,slotAllow=?,rankingCheckAllow=? ,price=?WHERE seq = ?',
           [
             typeof distributorSeq === 'number' ? distributorSeq : null,
             role,
             excelAllow,
-            additionalRegAllow,
             userAllow,
             slotAllow,
             rankingCheckAllow,
@@ -126,11 +123,10 @@ export async function PUT(request: Request) {
         );
       }else{
         await pool.query(
-          'UPDATE `User` SET distributorId = ?,,excelAllow =?,additionalRegAllow =?,userAllow=?,slotAllow=?,rankingCheckAllow=?,price=? WHERE seq = ?',
+          'UPDATE `User` SET distributorId = ?,,excelAllow =?,userAllow=?,slotAllow=?,rankingCheckAllow=?,price=? WHERE seq = ?',
           [
             typeof distributorSeq === 'number' ? distributorSeq : null,
             excelAllow,
-            additionalRegAllow,
             userAllow,
             slotAllow,
             rankingCheckAllow,
@@ -163,7 +159,7 @@ export async function PUT(request: Request) {
         );
     }
 
-    return NextResponse.json({ message: '총판/대행사 정보가 업데이트되었습니다.' });
+    return NextResponse.json({ message: '총판/대행 정보가 업데이트되었습니다.' });
   } catch (error) {
     console.error('업데이트 오류:', error);
     return NextResponse.json({ error: '업데이트 중 오류 발생' }, { status: 500 });

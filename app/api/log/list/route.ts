@@ -51,7 +51,6 @@ export async function GET(request: Request) {
     const [rows] = await pool.query(
       `SELECT 
         l.seq, 
-        l.keywordLimit AS keywordLimit,
         l.created_at AS createdAt, 
         l.type,
         l.refund_at AS refundAt,

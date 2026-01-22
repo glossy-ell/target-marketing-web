@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from 'lib/db';
 
-// ✅ 총판 및 대행사 수정 API
+//  총판 및 대행 수정 API
 export async function PUT(request: Request) {
   try {
     const { userSeq, editorSeq, price} = await request.json();

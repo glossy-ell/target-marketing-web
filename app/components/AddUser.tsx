@@ -60,13 +60,13 @@ const AddUser = () => {
       const data = await res.json();
 
       if (res.ok) {
-        Swal.fire('성공', '사용자가 추가되었습니다.', 'success');
+        Swal.fire('성공', '계정이 추가되었습니다.', 'success');
         setUserId('');
         setName('');
         setPassword('');
         setSelectedRole(null);
       } else {
-        Swal.fire('실패', data.error || '사용자 추가 실패', 'error');
+        Swal.fire('실패', data.error || '계정 추가 실패', 'error');
       }
     } catch (err) {
       Swal.fire('오류', '서버 오류가 발생했습니다.', 'error');
@@ -106,7 +106,7 @@ const AddUser = () => {
           <option value="">권한 선택</option>
           {availableRoles.map((r) => (
             <option key={r} value={r}>
-              {r === 1 ? '총판' : r === 2 ? '대행사' : '사용자'}
+              {r === 1 ? '총판' : r === 2 ? '대행' : '클라이언트'}
             </option>
           ))}
         </select>
@@ -114,7 +114,7 @@ const AddUser = () => {
           onClick={handleAddUser}
           className="w-full p-3 bg-black text-white rounded-md hover:bg-gray-800 transition"
         >
-          사용자 추가
+          계정 추가
         </button>
       </div>
     </div>

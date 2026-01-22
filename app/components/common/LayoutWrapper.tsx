@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 
-const noLayoutPaths = ['/','/exceldownloadpopup','/exceltotaldownloadpopup','/exceluploadpopup','/fixpopup']; // 필요한 예외 경로 추가
+const noLayoutPaths = ['/','/exceldownloadpopup','/exceltotaldownloadpopup','/excelspecdownloadpopup','/exceluploadpopup','/fixpopup']; // 필요한 예외 경로 추가
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

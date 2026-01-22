@@ -116,8 +116,9 @@ export default function TransactionSummaryCards({
       //   //   setPage(1);
       //   // },
       // },
-      { label: '정산가', value: totalSettlementPrice, desc: '총 정산가격' },
-      { label: '환불가', value: totalRefundPrice, desc: '총 환불가격' }
+
+      // { label: '정산가', value: totalSettlementPrice, desc: '총 정산가격' },
+      // { label: '환불가', value: totalRefundPrice, desc: '총 환불가격' }
     ];
 
 
@@ -126,9 +127,9 @@ export default function TransactionSummaryCards({
       {stats.map((item, idx) => (
         <div
           key={idx}
-          onClick={item.onClick ? item.onClick : undefined}
+          onClick={item.onClick !== undefined ? item.onClick : undefined}
           className={`flex-1 rounded-[12px] bg-white p-4 transition-transform duration-200
-          ${item.onClick ? 'cursor-pointer hover:shadow-md hover:scale-[1.02]' : ''}`}
+          ${item.onClick !== undefined ? 'cursor-pointer hover:shadow-md hover:scale-[1.02]' : ''}`}
         >
           <div>
             <div className="text-lg font-semibold mb-1">{item.label}</div>

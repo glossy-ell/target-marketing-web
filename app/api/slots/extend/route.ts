@@ -150,7 +150,6 @@ export async function POST(request: Request) {
           extendedStartDate, // 연장 시작일
           slot.endDate,
           extendDays,
-          slot.keywordLimit,
           adjustmentPrice,
           adjustmentPriceAgency,
           adjustmentPriceUser
@@ -159,7 +158,7 @@ export async function POST(request: Request) {
 
 
       const logQuery = `
-        INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,keywordLimit,adjustmentPrice,adjustmentPriceAgency,adjustmentPriceUser)
+        INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,adjustmentPrice,adjustmentPriceAgency,adjustmentPriceUser)
         VALUES ?
       `;
        await connection.query(logQuery, [logValues]);

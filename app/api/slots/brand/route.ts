@@ -34,7 +34,6 @@ export async function GET(request: Request) {
 
     const slotSeq = searchParams.get('slotSeq') || '';
     const keyword = searchParams.get('keyword') || searchParams.get('search') || '';
-    const productLink = searchParams.get('productLink') || '';
     const singleLink = searchParams.get('singleLink') || '';
 
     const params: any[] = [];
@@ -68,17 +67,6 @@ export async function GET(request: Request) {
         );
       }
 
-      if (productLink !== undefined) {
-        if (productLink === null || productLink.trim() === "") {
-          // null 또는 빈 문자열인 경우
-          whereClause += ` AND (s.productLink IS NULL OR s.productLink = '')`;
-        } else {
-          // 값이 있는 경우
-          whereClause += ` AND (s.productLink = ?)`;
-          params.push(productLink);
-        }
-      }
-
       if (singleLink !== undefined) {
         if (singleLink === null || singleLink.trim() === "") {
           // null 또는 빈 문자열인 경우
@@ -109,35 +97,13 @@ export async function GET(request: Request) {
         CONCAT(u.id, '\n(', u.name, ')') AS userId,
         CONCAT(a.id, '\n(', a.name, ')') AS agencyId,
         CONCAT(d.id, '\n(', d.name, ')') AS distributorId,
-        s.productLink, 
-        s.answerTagList,
-        s.productPrice,
-        s.productId,
-        s.storeName,
         s.keyword, 
         s.startDate, 
         s.endDate, 
         s.rank,
-        s.thumbnail,
         s.memo,
-        s.sortation,
-        s.secretKey1,
-        s.secretKey2,
-        s.secretKey3,
-        s.secretKey4,
-        s.secretLandingKey1,
-        s.secretLandingKey2,
-        s.secretLandingKey3,
-        s.secretLandingKey4,
-        s.status,
         s.singleLink,
         s.errMsg,
-        s.sceretKeyLinkType1,
-        s.sceretKeyLinkType2,
-        s.sceretKeyLinkType3,
-        s.sceretKeyLinkType4,
-        s.keywordLimit,
-        s.extraTime
         
       ${fromClause}
       ${whereClause}
@@ -182,7 +148,7 @@ export async function PUT(request: Request) {
 
 
     const body = await request.json();
-    const { seq, answerTagList,productPrice,storeName,thumbnail} = body;
+    const { seq, productPrice,storeName,thumbnail} = body;
 
 
 
@@ -192,7 +158,7 @@ export async function PUT(request: Request) {
 
   
     const [rows] = await pool.query<any[]>(
-      `SELECT seq, productLink, keyword, singleLink, sortation FROM Slot WHERE seq =?`,
+      `SELECT seq, keyword, singleLink FROM Slot WHERE seq =?`,
       seq
     );
     
@@ -208,18 +174,7 @@ export async function PUT(request: Request) {
     const fields: string[] = [];
     const values: any[] = [];
 
-    if (answerTagList !== undefined) {
-      fields.push('answerTagList = ?');
-      values.push(answerTagList);
-    }
-    if (productPrice !== undefined) {
-      fields.push('productPrice = ?');
-      values.push(productPrice);
-    }
-    if (storeName !== undefined) {
-      fields.push('storeName = ?');
-      values.push(storeName);
-    }
+
     if (storeName !== undefined) {
       fields.push('thumbnail= ?');
       values.push(thumbnail);

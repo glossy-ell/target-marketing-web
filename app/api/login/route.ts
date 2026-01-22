@@ -14,13 +14,13 @@ export async function POST(request: Request) {
     }
 
     const [rows]: any = await pool.query(
-      'SELECT seq, id, name, password, role, excelAllow,additionalRegAllow,slotAllow,userAllow,rankingCheckAllow FROM `User` WHERE id = ? AND isDeleted = 0',
+      'SELECT seq, id, name, password, role, excelAllow,slotAllow,userAllow,rankingCheckAllow FROM `User` WHERE id = ? AND isDeleted = 0',
       [username]
     );
 
 
     if (rows.length === 0) {
-      return NextResponse.json({ message: '존재하지 않는 사용자입니다.' }, { status: 401 });
+      return NextResponse.json({ message: '존재하지 않는 클라이언트입니다.' }, { status: 401 });
     }
 
     const user = rows[0];
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       const [agencyRows]: any = await pool.query(
         'SELECT seq, id, name, password, role FROM `User` WHERE id = ? AND isDeleted = 0',
         [username]
-      ); // 대행사
+      ); // 대행
       // if(agencyRows.length >0)
     }
     
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
 
 
     const token = jwt.sign(
-      { id: user.id, role: user.role, seq: user.seq, name: user.name ,excelAllow: user.excelAllow, additionalRegAllow: user.additionalRegAllow ,slotAllow: user.slotAllow,userAllow: user.userAllow, rankingCheckAllow:user.rankingCheckAllow},
+      { id: user.id, role: user.role, seq: user.seq, name: user.name ,excelAllow: user.excelAllow,slotAllow: user.slotAllow,userAllow: user.userAllow, rankingCheckAllow:user.rankingCheckAllow},
       JWT_SECRET,
       { expiresIn: '2h' }
     );

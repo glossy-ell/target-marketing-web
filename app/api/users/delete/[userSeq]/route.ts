@@ -47,7 +47,7 @@ export async function DELETE(
         return NextResponse.json({ message: '본인을 삭제할 수 없습니다.' }, { status: 400 });
     }
 
-    const [slotRows] = await pool.query<any[]>( `SELECT seq, productLink, keyword, singleLink, sortation,memo,userId,agencyId,distributorId FROM Slot WHERE userId=? OR  agencyId =? OR distributorId =?`,[userSeq,userSeq,userSeq]);
+    const [slotRows] = await pool.query<any[]>( `SELECT seq, keyword, singleLink,memo,userId,agencyId,distributorId FROM Slot WHERE userId=? OR  agencyId =? OR distributorId =?`,[userSeq,userSeq,userSeq]);
     const [userRows] = await pool.query<any[]>('SELECT seq, role FROM `User` WHERE seq = ? OR agencyId = ? OR distributorId =?', [userSeq,userSeq,userSeq]);
 
     const [extendRows] = await pool.query<any[]>( `SELECT seq, slotSeq,userSeq,extendDay,checked,agencyId,distributorId FROM extend WHERE userSeq=? OR  agencyId =? OR distributorId =?`,[userSeq,userSeq,userSeq]);

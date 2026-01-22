@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import pool from 'lib/db';
 
-// ✅ 총판 및 대행사 수정 API
+//  총판 및 대행 수정 API
 export async function PUT(request: Request) {
   try {
-    const { userSeq, editorSeq, userAllow, slotAllow,excelAllow ,additionalRegAllow,rankingCheckAllow} = await request.json();
+    const { userSeq, editorSeq, userAllow, slotAllow,excelAllow,rankingCheckAllow} = await request.json();
 
     if (!userSeq || !editorSeq) {
       return NextResponse.json({ message: 'userSeq와 editorSeq가 필요합니다.' }, { status: 400 });
@@ -44,12 +44,6 @@ export async function PUT(request: Request) {
       updateFields.push('excelAllow = ?');
       updateValues.push(excelAllow);
     }
-
-    if (additionalRegAllow !== null && additionalRegAllow !== undefined) {
-      updateFields.push('additionalRegAllow = ?');
-      updateValues.push(additionalRegAllow);
-    }
-
 
     
     if(rankingCheckAllow !== null && rankingCheckAllow !== undefined) {

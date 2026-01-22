@@ -127,7 +127,6 @@ export async function POST(request: NextRequest, { params }: { params: { page: s
         l.created_at AS createdAt, 
         l.refund_at AS refundAt, 
         l.type,
-        l.keywordLimit,
         l.agency,
         l.distributor,
         l.user,

@@ -64,11 +64,9 @@ export async function GET(request: Request) {
 
     if (keyword) {
       whereClause += ` AND (
-        s.productLink LIKE ? OR
         s.keyword LIKE ? OR
         u.id LIKE ? OR 
-        s.singleLink LIKE ? OR
-        s.productLink LIKE ? 
+        s.singleLink LIKE ?
       )`;
       params.push(
         `%${keyword}%`,
@@ -97,186 +95,21 @@ export async function GET(request: Request) {
     //검색타입
     if(slotSearchType !=0){// 전체
         if(slotSearchType ==1){  //정상
-          whereClause += ` AND DATE_SUB(s.startDate, INTERVAL 1 DAY) <= CURDATE() AND s.endDate >= CURDATE()  AND s.status = true AND NOT 
-           (
-                      s.keywordLimit = 4 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                                  OR s.secretLandingKey3 IS NULL
-                                  OR s.secretLandingKey4 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-                                  OR s.secretKey3 IS NULL
-                                  OR s.secretKey4 IS NULL
-                              )
-                            )
-                          ) OR 
-                      s.keywordLimit = 3 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                                  OR s.secretLandingKey3 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-                                  OR s.secretKey3 IS NULL
-                              )
-                            )
-                          ) OR
-                      s.keywordLimit = 2 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-
-                              )
-                            )
-                          )OR
-
-                          s.keywordLimit = 1 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                              )
-                            )
-                          )
-        )`;
+          whereClause += ` AND DATE_SUB(s.startDate, INTERVAL 1 DAY) <= CURDATE() AND s.endDate >= CURDATE() 
+            AND s.keyword IS NOT NULL AND s.keyword <> ''
+            AND s.singleLink IS NOT NULL AND s.singleLink <> ''
+            AND s.mid IS NOT NULL AND s.mid <> ''
+            AND sr.seq IS NOT NULL`;
         }else if(slotSearchType ==2){ //오류
-          whereClause += `AND (s.status = false or s.sortation = 0 OR COALESCE(s.productPrice, 0) <= 0  
-
-                        OR s.thumbnail IS NULL
-                        OR s.thumbnail = ''
-                        OR s.productPrice IS NULL 
-                        OR s.productPrice = 0
-                        OR s.answerTagList IS NULL 
-                        OR s.storeName IS NULL 
-                        OR s.productId IS NULL
-                        OR (
-                          COALESCE(TRIM(s.productLink), '') <> '' 
-                          AND (
-                            COALESCE(s.comparePriceLowestPrice, 0) <= 0
-                            OR COALESCE(s.comparePriceURL, '') = ''
-                            OR COALESCE(s.comparePriceSalePlaceCount, 0) <= 0
-                          )
-                        )
-                      
-                    OR   
-                    (
-                      (
-                        COALESCE(s.comparePriceLowestPrice, 0) <= 0 OR
-                        COALESCE(s.comparePriceSalePlaceCount, 0) <= 0 
-                      ) AND COALESCE(TRIM(productLink), '') <> ''
-                    )OR
-                    (
-                      s.keywordLimit = 4 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                                  OR s.secretLandingKey3 IS NULL
-                                  OR s.secretLandingKey4 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-                                  OR s.secretKey3 IS NULL
-                                  OR s.secretKey4 IS NULL
-                              )
-                            )
-                          ) OR 
-                      s.keywordLimit = 3 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                                  OR s.secretLandingKey3 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-                                  OR s.secretKey3 IS NULL
-                              )
-                            )
-                          ) OR
-                      s.keywordLimit = 2 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                                  OR s.secretLandingKey2 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                                  OR s.secretKey2 IS NULL
-
-                              )
-                            )
-                          )OR
-
-                          s.keywordLimit = 1 AND
-                          (
-                            (s.sortation = 2 
-                              AND (
-                                  s.secretLandingKey1 IS NULL
-                              )
-                            )
-                            OR 
-                            (s.sortation = 1
-                              AND (
-                                  s.secretKey1 IS NULL
-                              )
-                            )
-                          )
-                      
-                    )
-          ) `;
+          whereClause += ` AND (s.keyword IS NULL OR s.keyword = '' 
+                        OR s.singleLink IS NULL OR s.singleLink = '' 
+                        OR s.mid IS NULL OR s.mid = ''
+                        OR sr.seq IS NULL)`;
         }else if (slotSearchType == 3){ //대기
           whereClause += `
-              AND s.status = false
               AND s.rank IS NULL
               AND NOT (
-                 (s.singleLink IS NOT NULL AND s.singleLink LIKE '%.brand%')
-                AND s.productLink IS NULL
+                 (s.singleLink IS NOT NULL)
               )
             `;
         }
@@ -290,6 +123,12 @@ export async function GET(request: Request) {
       LEFT JOIN \`User\` u ON s.userId = u.seq
       LEFT JOIN \`User\` a ON s.agencyId = a.seq
       LEFT JOIN \`User\` d ON s.distributorId = d.seq
+      LEFT JOIN (
+        SELECT keyword, singleLink, MAX(seq) as seq
+        FROM slot_ranking
+        WHERE DATE(created) = CURDATE()
+        GROUP BY keyword, singleLink
+      ) sr ON s.keyword = sr.keyword AND s.singleLink = sr.singleLink
     `;
 
     if(rankOption == 1){
@@ -300,7 +139,6 @@ export async function GET(request: Request) {
               sr.singleLink,
               sr.keyword,
               sr.ranking,
-              sr.productLink,
               DATE(sr.created) AS rankDate,
               sr.created,
               ROW_NUMBER() OVER (
@@ -311,13 +149,11 @@ export async function GET(request: Request) {
           )
           SELECT
             today.singleLink,
-            today.productLink,
             today.keyword
           FROM RankedSlot today
           JOIN RankedSlot yesterday
             ON today.singleLink <=> yesterday.singleLink
             AND today.keyword <=> yesterday.keyword
-            AND today.productLink <=> yesterday.productLink
           WHERE
             today.rn = 1
             AND yesterday.rn = 1
@@ -329,8 +165,6 @@ export async function GET(request: Request) {
           (s.singleLink = rankFilter.singleLink OR (s.singleLink IS NULL AND rankFilter.singleLink IS NULL))
           AND
           (s.keyword = rankFilter.keyword OR (s.keyword IS NULL AND rankFilter.keyword IS NULL))
-          AND
-          (s.productLink = rankFilter.productLink OR (s.productLink IS NULL AND rankFilter.productLink IS NULL))
         )
       `;
     }else if(rankOption == -1){
@@ -339,7 +173,6 @@ export async function GET(request: Request) {
           WITH RankedSlot AS (
             SELECT
               sr.singleLink,
-              sr.productLink,
               sr.keyword,
               sr.ranking,
               DATE(sr.created) AS rankDate,
@@ -352,13 +185,11 @@ export async function GET(request: Request) {
           )
           SELECT
             today.singleLink,
-            today.productLink,
             today.keyword
           FROM RankedSlot today
           JOIN RankedSlot yesterday
             ON today.singleLink <=> yesterday.singleLink
             AND today.keyword <=> yesterday.keyword
-            AND today.productLink <=> yesterday.productLink
           WHERE
             today.rn = 1
             AND yesterday.rn = 1
@@ -370,8 +201,6 @@ export async function GET(request: Request) {
           (s.singleLink = rankFilter.singleLink OR (s.singleLink IS NULL AND rankFilter.singleLink IS NULL))
           AND
           (s.keyword = rankFilter.keyword OR (s.keyword IS NULL AND rankFilter.keyword IS NULL))
-          AND
-          (s.productLink = rankFilter.productLink OR (s.productLink IS NULL AND rankFilter.productLink IS NULL))
         )
       `;
     }
@@ -384,41 +213,15 @@ export async function GET(request: Request) {
         CONCAT(u.id, '\n(', u.name, ')') AS userId,
         CONCAT(a.id, '\n(', a.name, ')') AS agencyId,
         CONCAT(d.id, '\n(', d.name, ')') AS distributorId,
-        s.productLink, 
-        s.answerTagList,
-        s.productPrice,
-        s.productId,
-        s.storeName,
         s.keyword, 
         s.startDate, 
         s.endDate, 
         s.rank,
-        s.thumbnail,
         s.memo,
-        s.sortation,
-        s.secretKey1,
-        s.secretKey2,
-        s.secretKey3,
-        s.secretKey4,
-        s.secretLandingKey1,
-        s.secretLandingKey2,
-        s.secretLandingKey3,
-        s.secretLandingKey4,
-        s.status,
         s.singleLink,
         s.errMsg,
-        s.sceretKeyLinkType1,
-        s.sceretKeyLinkType2,
-        s.sceretKeyLinkType3,
-        s.sceretKeyLinkType4,
-        s.keywordLimit,
-        s.comparePriceLowestPrice,
-        s.comparePriceURL,
-        s.comparePriceSalePlaceCount,
-        s.productPrice,
-        s.answerTagList,
-        s.storeName,
-        s.extraTime
+        s.mid,
+        IF(sr.seq IS NOT NULL, 1, 0) as hasRanking
       ${fromClause}
       ${whereClause}
       ORDER BY s.seq DESC
@@ -491,20 +294,18 @@ export async function POST(request: Request) {
         user.distributorId || null,
         slot.startDate,
         slot.endDate,
-        slot.keywordLimit,
-        slot.extraTime,
       ]);
     }
   
     const query = `
-      INSERT INTO Slot (userId, agencyId, distributorId, startDate, endDate,keywordLimit,extraTime)
+      INSERT INTO Slot (userId, agencyId, distributorId, startDate, endDate)
       VALUES ?
     `;
     
     const [result] = await pool.query<ResultSetHeader>(query, [values]);
 
     const logQuery = `
-     INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,keywordLimit,adjustmentPrice,adjustmentPriceAgency,adjustmentPriceUser)
+     INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,adjustmentPrice,adjustmentPriceAgency,adjustmentPriceUser)
      VALUES ?
     `; // 로그 추가 
 
@@ -594,7 +395,6 @@ export async function POST(request: Request) {
         slot.startDate,
         slot.endDate,
         adjustmentDay,
-        slot.keywordLimit,
         adjustmentPrice,
         adjustmentPriceAgency,
         adjustmentPriceUser
@@ -620,19 +420,16 @@ export async function PUT(request: Request) {
 
 
     const body = await request.json();
-    const { seqs, productLink, keyword, memo ,sortation,singleLink} = body;
+    const { seqs, keyword, memo ,singleLink, mid} = body;
 
     if (!Array.isArray(seqs) || seqs.length === 0) {
       return NextResponse.json({ error: '수정할 슬롯 ID 목록이 없습니다.' }, { status: 400 });
     }
 
-    // // 수정할 항목이 최소 하나라도 있는지 확인
-    // if (!productLink && !keyword && !singleLink && !sortation) {
-    //   return NextResponse.json({ error: '수정할 항목이 없습니다.' }, { status: 400 });
-    // }
+
 
     const [rows] = await pool.query<any[]>(
-      `SELECT seq, productLink, keyword, singleLink, sortation,memo FROM Slot WHERE seq IN (${seqs.map(() => '?').join(',')})`,
+      `SELECT seq, keyword, singleLink, memo, mid FROM Slot WHERE seq IN (${seqs.map(() => '?').join(',')})`,
       seqs
     );
     // 실제 수정할 값 계산
@@ -642,11 +439,10 @@ export async function PUT(request: Request) {
 
     for (const row of rows) { //바뀐값 검사
       if (
-        (productLink !== undefined && productLink !== row.productLink) ||
         (keyword !== undefined && keyword !== row.keyword) ||
         (singleLink !== undefined && singleLink !== row.singleLink) ||
-        (sortation !== undefined && sortation !== row.sortation)||
-        (memo !== undefined && memo !== row.memo)
+        (memo !== undefined && memo !== row.memo) ||
+        (mid !== undefined && mid !== row.mid)
       ) {
         hasChanges = true;
         break;
@@ -654,14 +450,10 @@ export async function PUT(request: Request) {
     }
 
     for (const row of rows) { // 데이터 null 비초기화 조건 검사 
-      const isProductLinkSame = productLink === undefined || productLink === row.productLink;
       const isSingleLinkSame = singleLink === undefined || singleLink === row.singleLink;
-      const isSortationSame = sortation === undefined || sortation === row.sortation;
-      const isDifferent = ((memo !== undefined && memo !== row.memo)  || (keyword !== undefined && keyword !== row.keyword)); // 키워드 , 메모 동시 체크 
+      const isDifferent = ((memo !== undefined && memo !== row.memo)  || (keyword !== undefined && keyword !== row.keyword) || (mid !== undefined && mid !== row.mid)); // 키워드 , 메모 동시 체크 
       if (
-        isProductLinkSame &&
         isSingleLinkSame &&
-        isSortationSame &&
         isDifferent
       ) {
         onlyMemo= true;
@@ -678,10 +470,7 @@ export async function PUT(request: Request) {
     const fields: string[] = [];
     const values: any[] = [];
 
-    if (productLink !== undefined) {
-      fields.push('productLink = ?');
-      values.push(productLink);
-    }
+ 
     if (singleLink !== undefined) {
       fields.push('singleLink = ?');
       values.push(singleLink);
@@ -694,73 +483,18 @@ export async function PUT(request: Request) {
       fields.push('memo = ?');
       values.push(memo);
     }
-
-    if (sortation !== undefined) {
-      fields.push('sortation = ?');
-      values.push(sortation);
+    if (mid !== undefined) {
+      fields.push('mid = ?');
+      values.push(mid);
     }
 
-    if (sortation !== undefined) {
-      fields.push('sortation = ?');
-      values.push(sortation);
-    }
 
 
     if(!onlyMemo){ // 값변동 있을경우 api 호출값 초기화 (메모만 수정될경우 미호출)
-      fields.push('storeName = ?');
-      values.push(null);
-      fields.push('answerTagList = ?');
-      values.push(null);
-      fields.push('productPrice = ?');
-      values.push(null);
-      fields.push('thumbnail = ?');
-      values.push(null);
       fields.push('rank = ?');
       values.push(null);
-      fields.push('productId = ?');
-      values.push(null);
-      fields.push('comparePriceLowestPrice = ?');
-      values.push(null);
-      fields.push('comparePriceURL = ?');
-      values.push(null);
-      fields.push('comparePriceSalePlaceCount = ?');
-      values.push(null);
-
-
-      //추가등록
-      // fields.push('secretKey1 = ?');
-      // values.push(null);
-
-      // fields.push('secretKey2 = ?');
-      // values.push(null);
-
-      // fields.push('secretKey3 = ?');
-      // values.push(null);
-
-      // fields.push('secretKey4 = ?');
-      // values.push(null);
-
-      // fields.push('secretLandingKey1 = ?');
-      // values.push(null);
-
-      // fields.push('secretLandingKey2= ?');
-      // values.push(null);
-
-      // fields.push('secretLandingKey3= ?');
-      // values.push(null);
-      
-      // fields.push('secretLandingKey4= ?');
-      // values.push(null);
-      //주석처리 (업체 요청)
     }
 
-    if (typeof singleLink === 'string' && singleLink.includes(".brand") && !productLink) {
-        fields.push('status = ?');
-        values.push(true);
-      }else{
-      fields.push('status = ?');
-      values.push(false);
-    }
 
     const setClause = fields.join(', ');
     const placeholders = seqs.map(() => '?').join(',');

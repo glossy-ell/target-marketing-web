@@ -54,7 +54,6 @@ export async function GET(request: Request) {
     // 검색 조건
     if (keyword) {
       whereClause += ` AND (
-        s.productLink LIKE ? OR
         s.keyword LIKE ? OR
         u.id LIKE ?
       )`;
@@ -75,9 +74,16 @@ export async function GET(request: Request) {
     // 슬롯 검색타입
     if (slotSearchType !== 0) {
       if (slotSearchType === 1) {
-        whereClause += ' AND DATE_SUB(s.startDate, INTERVAL 1 DAY) <= CURDATE() AND s.endDate >= CURDATE() AND s.status = true';
+        whereClause += ` AND DATE_SUB(s.startDate, INTERVAL 1 DAY) <= CURDATE() AND s.endDate >= CURDATE() 
+          AND s.keyword IS NOT NULL AND s.keyword <> ''
+          AND s.singleLink IS NOT NULL AND s.singleLink <> ''
+          AND s.mid IS NOT NULL AND s.mid <> ''
+          AND sr.seq IS NOT NULL`;
       } else if (slotSearchType === 2) {
-        whereClause += ' AND s.status = false';
+        whereClause += ` AND (s.keyword IS NULL OR s.keyword = '' 
+          OR s.singleLink IS NULL OR s.singleLink = '' 
+          OR s.mid IS NULL OR s.mid = ''
+          OR sr.seq IS NULL)`;
       } else if (slotSearchType === 3) {
         whereClause += ' AND s.rank IS NULL';
       } else if (slotSearchType === 4) {
@@ -90,6 +96,12 @@ export async function GET(request: Request) {
       LEFT JOIN \`User\` u ON s.userId = u.seq
       LEFT JOIN \`User\` a ON s.agencyId = a.seq
       LEFT JOIN \`User\` d ON s.distributorId = d.seq
+      LEFT JOIN (
+        SELECT keyword, singleLink, MAX(seq) as seq
+        FROM slot_ranking
+        WHERE DATE(created) = CURDATE()
+        GROUP BY keyword, singleLink
+      ) sr ON s.keyword = sr.keyword AND s.singleLink = sr.singleLink
     `;
 
     if (rankOption === 1 || rankOption === -1) {
@@ -98,24 +110,21 @@ export async function GET(request: Request) {
         JOIN (
           WITH RankedSlot AS (
             SELECT
-              sr.productLink,
               sr.keyword,
               sr.ranking,
               DATE(sr.created) AS rankDate,
               sr.created,
               ROW_NUMBER() OVER (
-                PARTITION BY sr.productLink, sr.keyword, DATE(sr.created)
+                PARTITION BY sr.keyword, DATE(sr.created)
                 ORDER BY sr.created DESC
               ) AS rn
             FROM slot_ranking sr
           )
           SELECT
-            today.productLink,
             today.keyword
           FROM RankedSlot today
           JOIN RankedSlot yesterday
-            ON today.productLink <=> yesterday.productLink
-            AND today.keyword <=> yesterday.keyword
+            ON today.keyword <=> yesterday.keyword
           WHERE
             today.rn = 1
             AND yesterday.rn = 1
@@ -124,8 +133,6 @@ export async function GET(request: Request) {
             AND today.ranking ${comparison} yesterday.ranking
         ) rankFilter
         ON (
-          (s.productLink = rankFilter.productLink OR (s.productLink IS NULL AND rankFilter.productLink IS NULL))
-          AND
           (s.keyword = rankFilter.keyword OR (s.keyword IS NULL AND rankFilter.keyword IS NULL))
         )
       `;
@@ -138,41 +145,13 @@ export async function GET(request: Request) {
         CONCAT(u.id, '\n(', u.name, ')') AS userId,
         CONCAT(a.id, '\n(', a.name, ')') AS agencyId,
         CONCAT(d.id, '\n(', d.name, ')') AS distributorId,
-        s.productLink, 
-        s.answerTagList,
-        s.productPrice,
-        s.productId,
-        s.storeName,
         s.keyword, 
         s.startDate, 
         s.endDate, 
         s.rank,
-        s.thumbnail,
         s.memo,
-        s.sortation,
-        s.secretKey1,
-        s.secretKey2,
-        s.secretKey3,
-        s.secretKey4,
-        s.secretLandingKey1,
-        s.secretLandingKey2,
-        s.secretLandingKey3,
-        s.secretLandingKey4,
-        s.status,
         s.singleLink,
-        s.errMsg,
-        s.sceretKeyLinkType1,
-        s.sceretKeyLinkType2,
-        s.sceretKeyLinkType3,
-        s.sceretKeyLinkType4,
-        s.keywordLimit,
-        s.comparePriceLowestPrice,
-        s.comparePriceURL,
-        s.comparePriceSalePlaceCount,
-        s.productPrice,
-        s.answerTagList,
-        s.storeName,
-        s.extraTime
+        s.errMsg
 
       ${fromClause}
       ${whereClause}

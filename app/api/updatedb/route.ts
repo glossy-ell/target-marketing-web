@@ -10,17 +10,13 @@ interface Slot extends RowDataPacket {
   userId: string;
   agencyId: string;
   distributorId: string;
-  productLink: string;
   keyword: string;
   startDate: string;
   endDate: string;
   rank: number;
-  thumbnail: string;
   memo: string;
   productPrice: number;
-  answerTagList: string;
   storeName: string;
-  isOutLanding: number;
 }
 
 export async function POST(req: NextApiRequest, res: NextApiResponse) {
@@ -50,17 +46,11 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
         CONCAT(u.id, '(', u.name, ')') AS userId,
         CONCAT(a.id, '(', a.name, ')') AS agencyId,
         CONCAT(d.id, '(', d.name, ')') AS distributorId,
-        s.productLink, 
         s.keyword, 
         s.startDate, 
         s.endDate, 
         s.rank,
-        s.thumbnail,
         s.memo,
-        s.productPrice,
-        s.answerTagList,
-        s.storeName,
-        s.isOutLanding
       FROM Slot s
       LEFT JOIN \`User\` u ON s.userId = u.seq
       LEFT JOIN \`User\` a ON s.agencyId = a.seq
@@ -108,7 +98,8 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
 
     async function processSlotsSequentially(rows: Slot[]) {
       for (const slot of rows) {
-        const url = slot.productLink;
+        //오류시 체크
+        const url = slot.singleLink;
         if(!url)
             continue
         try {
@@ -122,26 +113,22 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
               continue;
             
             const storeName = item.store_name ?? null;
-            const answerTagList = item.tag_list ?? [];
             const thumbnail = item.item_img ?? null;
             const productPrice = item.item_price ?? null;
 
             slot.storeName = storeName;
-            slot.answerTagList = answerTagList;
             slot.thumbnail = thumbnail;
             slot.productPrice = productPrice;
 
             const sql = `
               UPDATE Slot SET
                 storeName = ?,
-                answerTagList = ?,
                 thumbnail = ?,
                 productPrice = ?
               WHERE seq = ?
             `;
             const params = [
               storeName ?? null,
-              answerTagList ?? null,
               thumbnail ?? null,
               productPrice ?? null,
               slot.seq

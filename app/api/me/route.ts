@@ -16,19 +16,18 @@ export async function GET(req: Request) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    const { id, role, seq, name,excelAllow,additionalRegAllow,slotAllow,userAllow,rankingCheckAllow } = decoded as {
+    const { id, role, seq, name,excelAllow,slotAllow,userAllow,rankingCheckAllow } = decoded as {
       id: string;
       role: number;
       seq: number;
       name: string;
       excelAllow :number;
-      additionalRegAllow: number;
       slotAllow: number;
       userAllow: number;
       rankingCheckAllow : number;
     };
 
-    return NextResponse.json({ id, role, seq, name,excelAllow,additionalRegAllow ,slotAllow,userAllow,rankingCheckAllow});
+    return NextResponse.json({ id, role, seq, name,excelAllow ,slotAllow,userAllow,rankingCheckAllow});
   } catch (err) {
     return NextResponse.json({ error: '토큰 유효하지 않음' }, { status: 401 });
   }

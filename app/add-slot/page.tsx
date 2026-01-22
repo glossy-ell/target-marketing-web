@@ -17,7 +17,6 @@ export default function AddSlot() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [quantity, setQuantity] = useState<string>("1");
-  const [keywordLimit, setKeywordLimit] = useState<string>("4");
   const [userRole, setUserRole] = useState<number | null>(null);
   const [weekendOpen,setWeekendOpen] = useState<boolean>(false);
   const [time, setTime] = useState<{ open_start_time: string; open_end_time: string; edit_start_time: string; edit_end_time:string;} | null>(null);
@@ -117,7 +116,7 @@ export default function AddSlot() {
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const [currentUser, setCurrentUser] = useState<{ id: string; seq: number; role: number; excelAllow:number; additionalRegAllow:number; slotAllow:number; userAllow: number;} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; seq: number; role: number; excelAllow:number;  slotAllow:number; userAllow: number;} | null>(null);
 
   useEffect(() => {
     setDates(getStartAndEndDate(duration));
@@ -131,7 +130,7 @@ export default function AddSlot() {
         const res = await fetch('/api/me', { credentials: 'include' });
         if (!res.ok) throw new Error('로그인 정보 없음');
         const user = await res.json();
-        setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow), additionalRegAllow:  Number(user.additionalRegAllow), slotAllow: Number(user.slotAllow),userAllow:Number(user.userAllow)});
+        setCurrentUser({ id: user.id, seq: user.seq, role: Number(user.role),excelAllow: Number(user.excelAllow), slotAllow: Number(user.slotAllow),userAllow:Number(user.userAllow)});
         setUserRole(Number(user.role));
       } catch (err) {
         console.error('유저 인증 실패:', err);
@@ -159,7 +158,7 @@ export default function AddSlot() {
     const fetchUsers = async () => {
       try {
         const response = await fetch('/api/users');
-        if (!response.ok) throw new Error('사용자 데이터를 불러올 수 없습니다.');
+        if (!response.ok) throw new Error('클라이언트 데이터를 불러올 수 없습니다.');
 
         const data: User[] = await response.json();
 
@@ -167,7 +166,7 @@ export default function AddSlot() {
 
         setUsers(filtered);
       } catch (err) {
-        console.error('사용자 목록 로드 실패:', err);
+        console.error('클라이언트 목록 로드 실패:', err);
       }
     };
 
@@ -211,21 +210,11 @@ export default function AddSlot() {
       return;
     }
 
-    let keywordLimitCheck = "0";
-    let extraTime = 0;
-    if(Number(keywordLimit) <= 4)
-      keywordLimitCheck = keywordLimit;
-    else if (Number(keywordLimit)==5){
-      keywordLimitCheck = "4";
-      extraTime = 1;
-    }
-
+ 
     const slotData = Array.from({ length: Number(quantity) }, () => ({
       userId: selectedUser,
       startDate,
       endDate,
-      keywordLimit:Number(keywordLimitCheck),
-      extraTime,
     }));
 
     try {
@@ -245,7 +234,6 @@ export default function AddSlot() {
       alert('슬롯이 성공적으로 추가되었습니다.');
       setSelectedUser('');
       setQuantity("1");
-      setKeywordLimit("4");
       setSearchTerm('');
       setDates(getStartAndEndDate(7));
     } catch (error) {
@@ -331,32 +319,8 @@ export default function AddSlot() {
           }}
         />
 
-        <label className="block mb-2 font-medium">상품명 추가</label>
-        <input
-          type="number"
-          className="w-full p-2 border rounded mb-4"
-          value={keywordLimit}
-          min={1}
-          max={5}
-          onChange={(e) => {
-            const val = e.target.value;
-            // 숫자 또는 빈 문자열만 허용
-            if (/^\d*$/.test(val)) {
-              if (val === '') {
-                setKeywordLimit('');
-              } else if (Number(val) >= 1 && Number(val) <= 5) {
-                setKeywordLimit(val);
-              }
-            }
-          }}
-          onBlur={() => {
-            if (keywordLimit === '' || Number(keywordLimit) < 1) {
-              setKeywordLimit("1");
-            }
-          }
-        }
-        />
 
+  
         <label className="block mb-2 font-medium">기간 선택</label>
 
         <div className="flex gap-2 mb-6">

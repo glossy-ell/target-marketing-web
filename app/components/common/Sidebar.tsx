@@ -116,7 +116,7 @@ export default function Sidebar() {
                     : 'hover:bg-gray-200'
                 }`}
               >
-                사용자관리
+                계정관리
               </Link>
             )}
 

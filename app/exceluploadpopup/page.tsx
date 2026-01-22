@@ -9,53 +9,30 @@ interface Slot {
   userId: string;
   agencyId: string;
   distributorId: string;
-  productLink: string;
   keyword: string;
   startDate: string;
   endDate: string;
-  productId: string | null;
-  vendorId: string | null;
-  thumbnail: string;
   rank: string;
   memo: string;
-  sortation : number;
-  secretKey1 : string;
-  secretKey2 : string;
-  secretKey3 : string;
-  secretKey4 : string;
-  secretLandingKey1 : string;
-  secretLandingKey2 : string;
-  secretLandingKey3 : string;
-  secretLandingKey4 : string;
-  singleLink : string;
-  status: boolean;
-  createdAt: string;
+  singleLink: string;
   errMsg: string;
-  sceretKeyLinkType1: number|null;
-  sceretKeyLinkType2: number|null;
-  sceretKeyLinkType3: number|null;
-  sceretKeyLinkType4: number|null;
-  keywordLimit: number;
-  comparePriceLowestPrice: number;
-  comparePriceURL: string;
-  comparePriceSalePlaceCount: number;
+  mid: string | null;
+  hasRanking: number;
+  createdAt: string;
 }
 
 
  const headerMapKeyword: Record<string, string> = {
       "슬롯번호": "슬롯번호",
-      "상점명": `상점 명\n(공백 포함 최대 10자까지 노출)\n※ 다음 단어 포함 시 소재 비활성화: 등상품, 위상품, 구매, !, ~, #, 펼치기, 찜하기, 상세, 장바구니, 사러가기클릭, 등클릭, 번째클릭, 스토어클릭, 상품클릭, 클릭+찜`,
-      "랜딩 URL": "랜딩 URL\n아래 6가지 중 택 1\n\n1. https://naver.com\n\n2. https://m.naver.com\n\n3. https://msearch.shopping.naver.com\n\n4. https://search.shopping.naver.com/home\n\n5. https://search.shopping.naver.com/ns\n\n6. https://app.shopping.naver.com/bridge",
-      "시작 날짜": "시작 날짜\nYYYY-MM-DD",
-      "종료 날짜": "종료 날짜\nYYYY-MM-DD",
-      "목표 트래픽 수": "목표 트래픽 수\n소재 별로 유입되길 희망하는 목표 트래픽 수를 입력해주세요 (ex. 1000)",
-      "아웃랜딩 여부": "아웃랜딩 여부\n\"Y\" 만 입력",
-      "검색어": "검색어\n유저가 검색할 키워드를 입력해주세요.",
-      "정답 태그 목록": "정답 태그 목록\n유저가 눌러야 하는 상품 페이지의 관련 태그를 모두 입력해주세요.",
-      "상품 이미지 URL": "상품 이미지 URL\n유저가 눌러야 하는 상품의 대표 이미지 링크를 입력해주세요. \n검색 결과에 노출되는 이미지와 동일해야 해요.",
-      "상품 가격": "상품 가격\n눌러야 하는 상품의 가격을 똑같이 입력해주세요.\n검색 결과에 노출되는 가격과 동일해야 해요.",
-      "상품 ID": "상품 ID\n상품 상세 페이지의 ID를 입력해주세요.",
-      "상품 URL": "상품 URL\n상품 상세 페이지의 URL를 입력해주세요.",
+      "상점명": `상점 명`,
+      "상품 링크": "상품 링크",
+      "시작 날짜": "시작 날짜",
+      "종료 날짜": "종료 날짜",
+      "검색어": "검색어",
+      "상품 이미지 URL": "상품 이미지 URL",
+      "상품 가격": "상품 가격",
+      "상품 URL": "상품 URL",
+      "MID": "MID",
     };
 
     const headerMapKeywordMulti: Record<string, string> = {
@@ -64,16 +41,9 @@ interface Slot {
       "랜딩 URL": "랜딩 URL\n아래 6가지 중 택 1\n\n1. https://naver.com\n\n2. https://m.naver.com\n\n3. https://msearch.shopping.naver.com\n\n4. https://search.shopping.naver.com/home\n\n5. https://search.shopping.naver.com/ns\n\n6. https://app.shopping.naver.com/bridge",
       "시작 날짜": "시작 날짜\nYYYY-MM-DD",
       "종료 날짜": "종료 날짜\nYYYY-MM-DD",
-      "목표 트래픽 수": "목표 트래픽 수\n소재 별로 유입되길 희망하는 목표 트래픽 수를 입력해주세요 (ex. 1000)",
-      "아웃랜딩 여부": "아웃랜딩 여부\n\"Y\" 만 입력",
-      "가격 비교 최저가": "가격 비교 최저가\n가격 비교 최저가를 입력해주세요. 상품 가격이 아니에요",
-      "가격 비교 이미지": "가격 비교 이미지\n가격 비교 대표 상품 이미지 URL을 입력해주세요",
-      "가격 비교 판매처 수": "가격 비교 판매처 수\n가격 비교 판매처 수를 입력해주세요",
       "상품 가격": "상품 가격\n상품 가격을 입력해주세요",
       "상품 이미지 URL": "상품 이미지\n상품 이미지를 입력해주세요",
-      "검색어": "검색어\n검색어를 입력해주세요. 검색 후 랜딩되는 페이지에 상품이 보이지 않으면 소재가 종료될 수 있어요.",
-      "정답 태그 목록": "정답 태그 목록\n정답 태그 목록을 입력해주세요",
-    };
+      "검색어": "검색어\n검색어를 입력해주세요. 검색 후 랜딩되는 페이지에 상품이 보이지 않으면 소재가 종료될 수 있어요.",      "MID": "MID\nMID를 입력해주세요",    };
 
     const headerMapLanding: Record<string, string> = {
       "슬롯번호": "슬롯번호",
@@ -81,13 +51,10 @@ interface Slot {
       '랜딩 URL': '랜딩 URL\n상품이 검색된 페이지 혹은 상품이 보이는 페이지를 세팅해주세요.',
       '시작 날짜': '시작 날짜\nYYYY-MM-DD',
       '종료 날짜': '종료 날짜\nYYYY-MM-DD',
-      '목표 트래픽 수': '목표 트래픽 수\n소재 별로 유입되길 희망하는 목표 트래픽 수를 입력해주세요 (ex. 1000)',
-      '아웃랜딩 여부': '아웃랜딩 여부\n"Y" 만 입력',
-      '정답 태그 목록': '정답 태그 목록\n유저가 눌러야 하는 상품 페이지의 관련 태그를 모두 입력해주세요.',
       '상품 이미지 URL': '상품 이미지 URL\n유저가 눌러야 하는 상품의 대표 이미지 링크를 입력해주세요. \n검색 결과에 노출되는 이미지와 동일해야 해요.',
       '상품 가격': '상품 가격\n눌러야 하는 상품의 가격을 똑같이 입력해주세요.\n검색 결과에 노출되는 가격과 동일해야 해요.',
-      '상품 ID': '상품 ID\n상품 상세 페이지의 ID를 입력해주세요.',
-      '상품 URL': '상품 URL\n상품 상세 페이지의 URL를 입력해주세요.',
+      '상품 URL': '상품 URL\n상품 상세 페이지의 URL을 입력해주세요.',
+      'MID': 'MID\nMID를 입력해주세요',
     };
 
 
@@ -97,14 +64,9 @@ interface Slot {
       '랜딩 URL': '랜딩 URL\n상품이 검색된 페이지 혹은 상품이 보이는 페이지를 세팅해주세요.',
       '시작 날짜': '시작 날짜\nYYYY-MM-DD',
       '종료 날짜': '종료 날짜\nYYYY-MM-DD',
-      '목표 트래픽 수': '목표 트래픽 수\n소재 별로 유입되길 희망하는 목표 트래픽 수를 입력해주세요 (ex. 1000)',
-      '아웃랜딩 여부': '아웃랜딩 여부\n"Y" 만 입력',
-      '가격 비교 최저가': '가격 비교 최저가\n가격 비교 최저가를 입력해주세요. 상품 가격이 아니에요',
-      '가격 비교 이미지': '가격 비교 이미지\n가격 비교 대표 상품 이미지 URL을 입력해주세요',
-      '가격 비교 판매처수': '가격 비교 판매처 수\n가격 비교 판매처 수를 입력해주세요',
       '상품 가격': '상품 가격\n눌러야 하는 상품의 가격을 똑같이 입력해주세요.\n검색 결과에 노출되는 가격과 동일해야 해요.',
       '상품 이미지 URL': '상품 이미지 URL\n유저가 눌러야 하는 상품의 대표 이미지 링크를 입력해주세요. \n검색 결과에 노출되는 이미지와 동일해야 해요.',
-      '정답 태그 목록': '정답 태그 목록\n유저가 눌러야 하는 상품 페이지의 관련 태그를 모두 입력해주세요.',
+      'MID': 'MID\nMID를 입력해주세요',
     };
 
 export default function ExcelUploadPopupPage() {
@@ -276,9 +238,9 @@ export default function ExcelUploadPopupPage() {
   const handleApplyExcelData = async (uploadedData: any[]) => {
   if (!uploadedData || uploadedData.length === 0) return alert('엑셀 데이터가 없습니다.');
   for (const row of uploadedData) { // url 유효성 검사
-    const singleLink = row[headerMapKeyword["단일 링크"]]
-    if ((!singleLink || !singleLink.includes("brand."))&& row[headerMapKeyword["슬롯 번호"]] == null) {
-      alert("단일 링크가 비어있거나, 브랜드 URL이 아닌 데이터가 있습니다.");
+    const singleLink = row[headerMapKeyword["상품 링크"]]
+    if ((!singleLink )&& row[headerMapKeyword["슬롯 번호"]] == null) {
+      alert("상품 링크가 비어있습니다.");
       return;  // brand. 가 없으면 함수 종료 또는 해당 행 처리 중단
     }
   }
@@ -288,18 +250,11 @@ export default function ExcelUploadPopupPage() {
     const slotSeq = row[headerMapKeyword["슬롯 번호"]]
     const keyword = row[headerMapKeyword["키워드"]]
     // const singleLink = row[headerMapKeyword["단일 링크"]]
-    // const productLink = row[headerMapKeyword["원부 링크"]]
     const landingUrl =  row[headerMapKeyword["랜딩 URL"]]
     const startDate = row[headerMapKeyword["시작 날짜"]];
     const endDate = row[headerMapKeyword["종료 날짜"]];
-    const trapic = row[headerMapKeyword["목표 트래픽 수"]];
-    const isOutLanding = row[headerMapKeyword["아웃랜딩 여부"]];
-    const secretKey1 = row[headerMapKeyword["검색어"]];
-    const comparePriceLowestPrice = row[headerMapKeyword["가격 비교 최저가"]];
-    const comparePriceURL = row[headerMapKeyword["가격 비교 이미지"]];
-    const comparePriceSalePlaceCount = row[headerMapKeyword["가격 비교 판매처 수"]];
-    const productPrice = row[headerMapKeyword["상품 가격"]];
-    const thumbnail = row[headerMapKeyword["상품 이미지 URL"]];
+
+
 
 
 
@@ -311,14 +266,6 @@ export default function ExcelUploadPopupPage() {
         landingUrl: landingUrl,
         startDate: startDate,
         endDate: endDate,
-        trapic: trapic,
-        isOutLanding: isOutLanding,
-        secretKey1: secretKey1,
-
-
-
-        // singleLink: singleLink,
-        // productLink: productLink,
     };
     const params = new URLSearchParams(brandPayload).toString();
     try {
@@ -348,18 +295,8 @@ export default function ExcelUploadPopupPage() {
     };
     updatePayload.seq = seq;
 
-    if (row[headerMapKeyword["스토어명"]]) {
-      updatePayload.storeName = row[headerMapKeyword["스토어명"]];
-    }
-    if (row[headerMapKeyword["썸네일"]]) {
-      updatePayload.thumbnail = row[headerMapKeyword["썸네일"]];
-    }
-    if (row[headerMapKeyword["상품 가격"]]) {
-      updatePayload.productPrice = Number(row[headerMapKeyword["상품 가격"]]);
-    }
-    if (row[headerMapKeyword["정답 태그 목록"]]) {
-      updatePayload.answerTagList = row[headerMapKeyword["정답 태그 목록"]];
-    }
+   
+
 
     try {
       const res = await fetch('/api/slots/brand', {

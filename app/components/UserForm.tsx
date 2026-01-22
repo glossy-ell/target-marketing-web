@@ -73,7 +73,7 @@ const UserForm = ({ mode, initialData = {}, currentUser, onSuccess }: Props) => 
 
       <select value={role} onChange={(e) => setRole(Number(e.target.value))} className="w-full p-2 border rounded">
         <option value={1}>총판</option>
-        <option value={2}>대행사</option>
+        <option value={2}>대행</option>
         <option value={3}>사용자</option>
       </select>
 
@@ -85,7 +85,7 @@ const UserForm = ({ mode, initialData = {}, currentUser, onSuccess }: Props) => 
       </select>
 
       <select value={agencyId || ''} onChange={(e) => setAgencyId(e.target.value || null)} className="w-full p-2 border rounded">
-        <option value="">대행사 선택</option>
+        <option value="">대행 선택</option>
         {agencies.map((u) => (
           <option key={u.seq} value={u.seq}>{u.name} ({u.id})</option>
         ))}

@@ -60,7 +60,6 @@ export async function GET(request: Request) {
 
     if (keyword) {
       whereClause += ` AND (
-        s.productLink LIKE ? OR
         s.keyword LIKE ? OR
         u.id LIKE ?
       )`;
@@ -103,27 +102,11 @@ export async function GET(request: Request) {
         CONCAT(u.id, '(', u.name, ')') AS userId,
         CONCAT(a.id, '(', a.name, ')') AS agencyId,
         CONCAT(d.id, '(', d.name, ')') AS distributorId,
-        s.productLink, 
-        s.answerTagList,
-        s.productPrice,
-        s.productId,
-        s.storeName,
         s.keyword, 
         s.startDate, 
         s.endDate, 
         s.rank,
-        s.thumbnail,
         s.memo,
-        s.sortation,
-        s.secretKey1,
-        s.secretKey2,
-        s.secretKey3,
-        s.secretKey4,
-        s.secretLandingKey1,
-        s.secretLandingKey2,
-        s.secretLandingKey3,
-        s.secretLandingKey4,
-        s.status,
         e.extendDay,
         e.checked
       ${fromClause}
@@ -166,203 +149,6 @@ export async function GET(request: Request) {
 }
 
 
-
-// PUT - 연장 일괄 승인
-// export async function PUT(request: Request) {
-//   try {
-//     const body = await request.json();
-//     const {seqs} = body; // log의 seq
-//     const logType = 2; // 연장 == 2번 
-
-//     const currentUser = await getCurrentUser();
-//     if (!currentUser) {
-//       return NextResponse.json({ error: '인증 실패' }, { status: 401 });
-//     }
-
-//     const { seq, role } = currentUser;
-
-//     if (role != 0 && role != 1) { // 관리자 아닐경우
-//       return NextResponse.json({ error: '권한 없음' }, { status: 403 });
-//     }
-
-//     if (!Array.isArray(seqs) || seqs.length === 0) {
-//       return NextResponse.json({ error: '연장 승인할 슬롯 ID 목록이 없습니다.' }, { status: 400 });
-//     }
-
-
-//        const [extendRows] = await pool.query<any[]>(
-//         `SELECT slotSeq FROM extend WHERE seq IN (?) AND checked is null`,
-//         [seqs]  // seq는 log.seq 리스트
-//       );
-
-//       const slotSeqList = extendRows.map(row => row.slotSeq);
-//       if (slotSeqList.length === 0) {
-//           throw Error("연장할 슬롯을 찾지 못했습니다.");
-//       }
-
-    
-
-//     // 동적으로 SET 절 구성
-//     const fields: string[] = [];
-//     const values: any[] = [];
-
-        
-        
-
-//     const placeholders = seqs.map(() => '?').join(',');
-
-//     values.push(...seqs); // ID 목록도 마지막에 추가
-
-//     const query = `
-//       UPDATE Extend
-//       SET checked = true
-//       WHERE seq IN (${placeholders})
-//     `;
-
-//       await pool.query(query, values);
-      
-
-//       const [extendSlotRows] = await pool.query<any[]>(`
-//         SELECT slotSeq, extendDay
-//         FROM Extend
-//         WHERE seq IN (${placeholders})
-//       `, seqs);
-
-//       // 3. 각 슬롯에 대해 endDate 연장
-//       const updateQuery = `
-//         UPDATE Slot
-//         SET endDate = DATE_ADD(endDate, INTERVAL ? DAY)
-//         WHERE seq = ?
-//       `;
-
-//       for (const row of extendSlotRows) {
-//         await pool.query(updateQuery, [row.extendDay, row.slotSeq]);
-//       }
-
-//       const [targetSlotRows] = await pool.query<any[]>(`
-//         SELECT * FROM Slot WHERE seq IN (${slotSeqList.map(() => '?').join(',')}) ORDER BY seq ASC
-//       `, slotSeqList);
-      
- 
-
-
-//      const logValues: any[] = [];
-
-//     for (const slot of targetSlotRows) {
-      
-//       // const adjustmentDay = Math.ceil(
-//       //   (new Date(slot.endDate).getTime() - new Date(slot.startDate).getTime()) / (1000 * 60 * 60 * 24)
-//       // ) + 1;
-//       let targetRow;
-
-//       for (const row of extendSlotRows) {
-//          if(row.slotSeq == slot.seq){
-//           targetRow = row;
-//           break;
-//          }
-//       }
-//       const adjustmentDay = targetRow?.extendDay;
-
-//       // 2. 사용자 정보 조회
-//       const [[user]] = await pool.query<any[]>(`
-//         SELECT role, price, distributorId,agencyId
-//         FROM User
-//         WHERE seq = ?
-//       `, [slot.userId]);
-
-//       let price = 0;
-//       let agencyPrice = 0;
-//       let userPrice = 0;
-
-//       let adjustmentPrice =0;
-//       let adjustmentPriceAgency = 0;
-//       let adjustmentPriceUser = 0;
-
-//       // 3. price 계산 로직
-//       if (user) {
-//         if (user.role ===0 || user.role === 1) {
-//           price = user.price ?? 0;
-
-//         } else if (user.role == 2) {
-//           const [[distributor]] = await pool.query<any[]>(`
-//             SELECT price
-//             FROM User
-//             WHERE seq = ?
-//           `, [user.distributorId]);
-
-//           const [[agency]] = await pool.query<any[]>(`
-//             SELECT price
-//             FROM User
-//             WHERE seq = ?
-//           `, [user.agencyId]);
-
-//           price = distributor?.price ?? 0;
-//           agencyPrice = user.price ?? 0;
-          
-//         } else if (user.role ==3){
-
-//           const [[distributor]] = await pool.query<any[]>(`
-//             SELECT price
-//             FROM User
-//             WHERE seq = ?
-//           `, [user.distributorId]);
-
-//           const [[agency]] = await pool.query<any[]>(`
-//             SELECT price
-//             FROM User
-//             WHERE seq = ?
-//           `, [user.agencyId]);
-        
-//           price = distributor?.price ?? 0;
-//           agencyPrice = agency?.price ?? 0;
-//           userPrice = user.price ?? 0;
-//         }
-//       }
-
-//       adjustmentPrice = price * adjustmentDay;
-//       adjustmentPriceAgency = agencyPrice * adjustmentDay;
-//       adjustmentPriceUser = userPrice * adjustmentDay;
-
-//       const extendedStartDate = new Date(new Date(slot.endDate).getTime()+(9*60 * 60 * 1000) - (adjustmentDay -1 )* 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // 'YYYY-MM-DD' 형식
-
-
-//       // 4. logValues에 푸시
-//       logValues.push([
-//         logType,
-//         slot.createdAt,
-//         slot.agencyId || null,
-//         slot.distributorId || null,
-//         slot.userId,
-//         slot.seq,
-//         extendedStartDate,  //연장 시작일
-//         slot.endDate,
-//         adjustmentDay, // 연장일만 
-//         slot.keywordLimit,
-//         adjustmentPrice,
-//         adjustmentPriceAgency,
-//         adjustmentPriceUser,
-//       ]);
-//     }
-
-
-
-
-
-
-
-//       const logQuery = `
-//         INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,keywordLimit,adjustmentPrice,adjustmentPriceAgency,adjustmentPriceUser)
-//         VALUES ?
-//       `;
-//        await pool.query(logQuery, [logValues]);
-
-       
-//     return NextResponse.json({ message: '일괄 연장 완료' });
-//   } catch (error: any) {
-//     console.error('연장 승인 중 오류:', error);
-//     return NextResponse.json({ error: error.message }, { status: 500 });
-//   }
-// }
 
 
 export async function PUT(request: Request) {
@@ -454,7 +240,7 @@ export async function PUT(request: Request) {
 
       const adjustmentDay = targetRow.extendDay;
 
-      // 사용자 정보 조회
+      // 클라이언트 정보 조회
       const [[user]] = await connection.query<any[]>(
         `SELECT role, price, distributorId, agencyId FROM User WHERE seq = ?`,
         [slot.userId]
@@ -518,7 +304,6 @@ export async function PUT(request: Request) {
         extendedStartDate,
         slot.endDate,
         adjustmentDay,
-        slot.keywordLimit,
         adjustmentPrice,
         adjustmentPriceAgency,
         adjustmentPriceUser,
@@ -528,7 +313,7 @@ export async function PUT(request: Request) {
     const logQuery = `
       INSERT INTO Log (
         type, created_at, agency, distributor, user, slot_seq,
-        start_at, end_at, adjustment_day, keywordLimit,
+        start_at, end_at, adjustment_day,
         adjustmentPrice, adjustmentPriceAgency, adjustmentPriceUser
       ) VALUES ?
     `;

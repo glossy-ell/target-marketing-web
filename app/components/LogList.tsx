@@ -40,7 +40,6 @@ interface Props {
 interface Log {
   seq: number;
   slotSeq: number;
-  keywordLimit : number;
   type: number;
   user: string;
   agency: string;
@@ -243,7 +242,7 @@ const LogList = ({
 
 
   useEffect(() => {
-    // 대행사 목록 불러오기
+    // 대행 목록 불러오기
     fetch('/api/users/agencies')
       .then((res) => res.json())
       .then((data) => setAgencyList(data));
@@ -495,12 +494,11 @@ const LogList = ({
     const headerMapLog: Record<string, string> = {
       "번호": `번호`,
       "슬롯 번호": "슬롯 번호",
-      "상품명 추가": "상품명 추가",
       "오픈일": "오픈일",
       "환불일": "환불일",
       "총판 ID": "총판 ID",
-      "대행사 ID": "대행사 ID",
-      "사용자 ID": "사용자 ID",
+      "대행 ID": "대행 ID",
+      "클라이언트 ID": "클라이언트 ID",
       "구분": "구분",
       "정산일수": "정산일수",
       "정산가": "정산가",
@@ -515,12 +513,11 @@ const LogList = ({
         const baseRow = {
           '번호': log.seq,
           '슬롯 번호': log.slotSeq,
-          '상품명 추가': log.keywordLimit,
           "오픈일": log.createdAt.slice(0, 10),
           "환불일": log.refundAt?.slice(0, 10),
           '총판 ID': log.distributor?? '-',
-          '대행사 ID': log.agency?? '-',
-          '사용자 ID': log.user,
+          '대행 ID': log.agency?? '-',
+          '클라이언트 ID': log.user,
           '구분':log.type == 1
                 ? "발급"
                 : log.type == 2
@@ -603,10 +600,7 @@ const LogList = ({
           { wch: 60 },   // 랜딩URL
           { wch: 60 },   // 시작일
           { wch: 60 },   // 종료일
-          { wch: 60 },   // 목표 트래픽
-          { wch: 60 },   // 아웃랜딩 여부
           { wch: 60 },   // 검색어
-          { wch: 60 },   // 정답태그
           { wch: 60 },   // 상품이미지
           { wch: 60 },   // 상품 가격
           { wch: 60 },   // 상품 ID
@@ -686,7 +680,7 @@ const LogList = ({
               </select>
             )}
 
-            {/* 대행사 선택 */}
+            {/* 대행 선택 */}
             {(isAdmin || isDistributor) && (
               <select
                 value={selectedAgency}
@@ -696,7 +690,7 @@ const LogList = ({
                 }}
                 className="border border-gray-300 px-3 py-2 rounded text-sm"
               >
-                <option value="">대행사 선택</option>
+                <option value="">대행 선택</option>
                 {agencyList.map((a: any) => (
                   <option key={a.seq} value={a.seq}>
                     {a.name} ({a.id})
@@ -738,7 +732,7 @@ const LogList = ({
                     setStartDate(d);
                   }
                 }}
-                placeholderText="정산 시작일"
+                placeholderText="요청/접수신청 시작일"
                 shouldCloseOnSelect
                 maxDate={addMonths(new Date(), 4)}
                 locale={ko}
@@ -754,7 +748,7 @@ const LogList = ({
                     setEndDate(date);
                   }
                 }}
-                placeholderText="정산 종료일"
+                placeholderText="요청/접수신청 종료일"
                 shouldCloseOnSelect
                 maxDate={addMonths(new Date(), 4)}
                 locale={ko}
@@ -844,9 +838,6 @@ const LogList = ({
                     <tr>
                       <th className="px-5 py-4 border-b border-gray-300">번호</th>
                       <th className="px-5 py-4 border-b border-gray-300">슬롯 번호</th>
-                      {(isAdmin) && (
-                        <th className="px-5 py-4 border-b border-gray-300">상품명 추가</th>
-                      )}
                       <th className="px-5 py-4 border-b border-gray-300">오픈일</th>
                       <th className="px-5 py-4 border-b border-gray-300">환불일</th>
                       {isAdmin && (
@@ -854,7 +845,7 @@ const LogList = ({
                       )}
 
                       {(isAdmin || isDistributor) && (
-                        <th className="px-5 py-4 border-b border-gray-300">대행사 ID</th>
+                        <th className="px-5 py-4 border-b border-gray-300">대행 ID</th>
                       )}
 
                       <th className="px-5 py-4 border-b border-gray-300">사용자 ID</th>
@@ -883,11 +874,7 @@ const LogList = ({
                           <td className="p-3 border-b border-gray-200">
                             {log.slotSeq}
                           </td>
-                          {isAdmin && (
-                            <td className="p-3 border-b border-gray-200">
-                              {log.keywordLimit}
-                            </td>
-                          )}
+                 
                           <td className="p-3 border-b border-gray-200">
                             {log.createdAt
                               ? (() => {

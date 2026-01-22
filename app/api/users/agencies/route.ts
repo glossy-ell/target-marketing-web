@@ -19,7 +19,7 @@ async function getCurrentUser() {
 }
 
 
-// ✅ 대행사 목록
+//  대행 목록
 export async function GET(request: Request) {
 
   const currentUser = await getCurrentUser();

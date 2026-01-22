@@ -12,7 +12,6 @@ export async function GET() {
           u.role, 
           u.createdAt,
           u.excelAllow,
-          u.additionalRegAllow,
           u.slotAllow,
           u.userAllow,
           u.rankingCheckAllow,
