@@ -71,9 +71,6 @@ export async function DELETE(request: Request) {
       let agencyPrice = 0;
       let userPrice = 0;
 
-      let refundPrice =0;
-      let refundPriceAgency = 0;
-      let refundPriceUser = 0;
 
 
 
@@ -131,9 +128,6 @@ export async function DELETE(request: Request) {
       ) + plusDay;
 
 
-      refundPrice = price * adjustmentDay;
-      refundPriceAgency = agencyPrice * adjustmentDay;
-      refundPriceUser = userPrice * adjustmentDay;
 
 
       await pool.query('DELETE FROM Slot WHERE seq = ?', [seq]);
@@ -142,7 +136,7 @@ export async function DELETE(request: Request) {
    
 
       const logQuery = `
-      INSERT INTO Log (type,created_at,refund_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,refundPrice,refundPriceAgency,refundPriceUser)
+      INSERT INTO Log (type,created_at,refund_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day)
       VALUES ?
       `; // 로그 추가 
       const logValues =  [[
@@ -155,10 +149,7 @@ export async function DELETE(request: Request) {
         seq,  // ← slot의 seq 넣기
         targetSlot.startDate,
         targetSlot.endDate,
-        adjustmentDay,
-        refundPrice,
-        refundPriceAgency,
-        refundPriceUser
+        adjustmentDay
       ]];
 
 
@@ -215,9 +206,6 @@ export async function DELETE(request: Request) {
       let agencyPrice = 0;
       let userPrice = 0;
 
-      let refundPrice =0;
-      let refundPriceAgency = 0;
-      let refundPriceUser = 0;
 
       // 3. price 계산 로직
       if (user) {
@@ -276,9 +264,6 @@ export async function DELETE(request: Request) {
       ) + plusDay;
 
 
-      refundPrice = price * adjustmentDay;
-      refundPriceAgency = agencyPrice * adjustmentDay;
-      refundPriceUser = userPrice * adjustmentDay;
 
               
 
@@ -293,10 +278,7 @@ export async function DELETE(request: Request) {
           insertedId,
           slot.startDate,
           slot.endDate,
-          adjustmentDay,
-          refundPrice,
-          refundPriceAgency,
-          refundPriceUser
+          adjustmentDay
         ]);
       }
 
@@ -306,7 +288,7 @@ export async function DELETE(request: Request) {
    
 
       const logQuery = `
-        INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,refundPrice,refundPriceAgency,refundPriceUser)
+        INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day)
         VALUES ?
       `;
        await pool.query(logQuery, [logValues]);

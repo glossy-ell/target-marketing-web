@@ -21,8 +21,7 @@ export default function LogManagement() {
 
   const [page, setPage] = useState(1);
 
-  const[totalSettlementPrice,setTotalSettlementPrice] =useState<number>(0);
-  const[totalRefundPrice,setTotalRefundPrice] =useState<number>(0);
+
 
   return (
     <>
@@ -38,8 +37,7 @@ export default function LogManagement() {
         totalCancelCount={totalCancelCount}
         totalSettleCount={totalSettleCount}
         
-        totalSettlementPrice={totalSettlementPrice}
-        totalRefundPrice={totalRefundPrice}
+
 
         searchTotalIssued={searchTotalIssued}
         searchTotalRefund={searchTotalRefund}
@@ -66,10 +64,7 @@ export default function LogManagement() {
           setTotalCancelCount={setTotalCancelCount}
           setTotalSettleCount={setTotalSettleCount}
 
-          totalSettlementPrice={totalSettlementPrice}
-          totalRefundPrice={totalRefundPrice}
-          setTotalSettlementPrice={setTotalSettlementPrice}
-          setTotalRefundPrice={setTotalRefundPrice}
+
 
           searchTotalIssued={searchTotalIssued}
           searchTotalRefund={searchTotalRefund}

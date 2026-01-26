@@ -77,68 +77,11 @@ export async function POST(request: Request) {
           WHERE seq = ?
         `, [slot.userId]);
 
-        
-
-        // 3. price 계산 로직
-        
-        let price = 0;
-        let agencyPrice = 0;
-        let userPrice = 0;
-
-        let adjustmentPrice =0;
-        let adjustmentPriceAgency = 0;
-        let adjustmentPriceUser = 0;
-
-        // 3. price 계산 로직
-        if (user) {
-          if (user.role ===0 || user.role === 1) {
-            // 대리점이면 본인 가격 사용
-            price = user.price ?? 0;
-
-          } else if (user.role == 2) {
-            const [[distributor]] = await connection.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.distributorId]);
-
-            const [[agency]] = await connection.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.agencyId]);
-
-            price = distributor?.price ?? 0;
-            agencyPrice = user.price ?? 0;
-            
-          } else if (user.role ==3){
-
-            const [[distributor]] = await connection.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.distributorId]);
-
-            const [[agency]] = await connection.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.agencyId]);
-          
-            price = distributor?.price ?? 0;
-            agencyPrice = agency?.price ?? 0;
-            userPrice = user.price ?? 0;
-          }
-        }
-
-        adjustmentPrice = price * extendDays;
-        adjustmentPriceAgency = agencyPrice * extendDays;
-        adjustmentPriceUser = userPrice * extendDays;
-
-      const extendedStartDate = new Date(new Date(slot.endDate).getTime()+(9*60 * 60 * 1000)- (extendDays-1) * 24 * 60 * 60 * 1000)
-        .toISOString().slice(0, 10); // 'YYYY-MM-DD' 형식
+      
 
 
+        const extendedStartDate = new Date(new Date(slot.endDate).getTime()+(9*60 * 60 * 1000)- (extendDays-1) * 24 * 60 * 60 * 1000)
+          .toISOString().slice(0, 10); // 'YYYY-MM-DD' 형식
         // logValues에 푸시
         logValues.push([
           2,
@@ -149,16 +92,13 @@ export async function POST(request: Request) {
           slot.seq,
           extendedStartDate, // 연장 시작일
           slot.endDate,
-          extendDays,
-          adjustmentPrice,
-          adjustmentPriceAgency,
-          adjustmentPriceUser
+          extendDays
         ]);
       }
 
 
       const logQuery = `
-        INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,adjustmentPrice,adjustmentPriceAgency,adjustmentPriceUser)
+        INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day)
         VALUES ?
       `;
        await connection.query(logQuery, [logValues]);

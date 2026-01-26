@@ -27,11 +27,6 @@ interface Props {
   searchTotalCancel: boolean;
   searchTotalSettle: boolean;
 
-  totalSettlementPrice: number;
-  totalRefundPrice: number;
-
-  setTotalSettlementPrice: Dispatch<SetStateAction<number>>;
-  setTotalRefundPrice: Dispatch<SetStateAction<number>>;
 
   page : number;
   setPage: Dispatch<SetStateAction<number>>;
@@ -45,18 +40,13 @@ interface Log {
   agency: string;
   distributor: string;
   adjustmentDay: number;
-  adjustmentPrice: number;
-  adjustmentPriceAgency: number;
-  adjustmentPriceUser: number;
+
   bundleIdx: number;
   slotIdx: number
   createdAt: string; // = 정산일시
   startAt: string;
   endAt: string;
   refundAt: string; // 환불일
-  refundPrice : number;
-  refundPriceAgency: number;
-  refundPriceUser: number;
 }
 
 interface User {
@@ -77,15 +67,7 @@ const formatDate = (dateString: string) => {
 };
 
 const LogList = ({
-
-
-  totalSettlementPrice,
-  totalRefundPrice,
-
-
   setTotalCount,
-  setTotalSettlementPrice,
-  setTotalRefundPrice,
   setTotalIssuedCount,
   setTotalRefundCount,
   setTotalCancelCount,
@@ -201,16 +183,7 @@ const LogList = ({
 
 
 
-      if(isAdmin ){
-        setTotalSettlementPrice(totalIssuedSum);
-        setTotalRefundPrice(refundIssuedSum);
-      }else if(isDistributor){
-        setTotalSettlementPrice(totalIssuedSumAgency);
-        setTotalRefundPrice(refundIssuedSumAgency);
-      }else{
-        setTotalSettlementPrice(totalIssuedSumUser);
-        setTotalRefundPrice(refundIssuedSumUser);
-      }
+  
 
     } catch (err: unknown) {
       console.error('error occurs while fetch logs error:', err);
@@ -365,16 +338,7 @@ const LogList = ({
       // setTotalCancelCount(response.data.totalCancelCount);
       // setTotalSettleCount(response.data.totalSettlement);
 
-      if(isAdmin ||isDistributor){
-        setTotalSettlementPrice(response.data.totalIssuedSum);
-        setTotalRefundPrice(response.data.refundIssuedSum);
-      }else if(isAgency){
-        setTotalSettlementPrice(response.data.totalIssuedSumAgency);
-        setTotalRefundPrice(response.data.refundIssuedSumAgency);
-      }else{
-        setTotalSettlementPrice(response.data.totalIssuedSumUser);
-        setTotalRefundPrice(response.data.refundIssuedSumUser);
-      }
+
 
 
       setTotalPages(response.data.totalPages);
@@ -501,8 +465,8 @@ const LogList = ({
       "클라이언트 ID": "클라이언트 ID",
       "구분": "구분",
       "정산일수": "정산일수",
-      "정산가": "정산가",
-      "환불가": "환불가",
+      "유입수": "유입수",
+      // "환불가": "환불가",
       "시작일": "시작일",
       "종료일": "종료일",
     };
@@ -514,7 +478,7 @@ const LogList = ({
           '번호': log.seq,
           '슬롯 번호': log.slotSeq,
           "오픈일": log.createdAt.slice(0, 10),
-          "환불일": log.refundAt?.slice(0, 10),
+          "환불일": log.refundAt?.slice(0, 10) ?? '-',
           '총판 ID': log.distributor?? '-',
           '대행 ID': log.agency?? '-',
           '클라이언트 ID': log.user,
@@ -528,8 +492,7 @@ const LogList = ({
                 ? "철회"
                 : "",
           '정산일수': log.adjustmentDay,
-          '정산가' : log.adjustmentPrice,
-          "환불가": log.refundPrice,
+          '유입수' : log.adjustmentDay * 100,
           '시작일': log.startAt.slice(0, 10),
           '종료일': log.endAt.slice(0, 10),
         };
@@ -596,16 +559,18 @@ const LogList = ({
 
 
         logWorkSheet['!cols'] = [
-          { wch: 42 },   // 상점명
-          { wch: 60 },   // 랜딩URL
-          { wch: 60 },   // 시작일
-          { wch: 60 },   // 종료일
-          { wch: 60 },   // 검색어
-          { wch: 60 },   // 상품이미지
-          { wch: 60 },   // 상품 가격
-          { wch: 60 },   // 상품 ID
-          { wch: 60 },   // 상품 URL
-          { wch: 60 },
+          { wch: 20 },   //번호
+          { wch: 20 },   //슬롯 번호
+          { wch: 20 },   //오픈일
+          { wch: 20 },   //환불일
+          { wch: 42 },   //총판
+          { wch: 42 },   //대행
+          { wch: 42 },   //클라이언트
+          { wch: 10 },   //구분
+          { wch: 10 },   //정산일수
+          { wch: 10 },   //유입수
+          { wch: 20 },   //시작일
+          { wch: 20 }    //종료일
         ];
 
         const keywordWorkbook = XLSX.utils.book_new();
@@ -852,8 +817,8 @@ const LogList = ({
                       {/* 기존 컬럼들 */}
                       <th className="px-5 py-4 border-b border-gray-300">구분</th>
                       <th className="px-5 py-4 border-b border-gray-300">정산일수</th>
-                      <th className="px-5 py-4 border-b border-gray-300">정산가</th>
-                      <th className="px-5 py-4 border-b border-gray-300">환불가</th>
+                      <th className="px-5 py-4 border-b border-gray-300">유입수</th>
+                      {/* <th className="px-5 py-4 border-b border-gray-300">환불가</th> */}
                       <th className="px-5 py-4 border-b border-gray-300">시작일</th>
                       <th className="px-5 py-4 border-b border-gray-300">종료일</th>
                     </tr>
@@ -891,7 +856,7 @@ const LogList = ({
                                   date.setHours(date.getHours() + 9); // UTC → KST
                                   return date.toISOString().substring(0, 10);
                                 })()
-                              : ""}
+                              : "-"}
                           </td>
                           {isAdmin && (
                             <>
@@ -928,16 +893,9 @@ const LogList = ({
                           </td>
                           <td className="p-3 border-b border-gray-200">
 
-                            {
-                            (isAdmin) ?(log.adjustmentPrice):(isDistributor?(log.adjustmentPriceAgency):(log.adjustmentPriceUser))
-                            }
+                            {log.adjustmentDay *100}
                           </td>
-                          <td className="p-3 border-b border-gray-200">
-
-                            {
-                            (isAdmin) ?(log.refundPrice):(isDistributor?(log.refundPriceAgency):(log.refundPriceUser))
-                            }
-                          </td>
+                 
                           <td className="p-3 border-b border-gray-200">
                             {log.startAt
                               ? (() => {

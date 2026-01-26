@@ -66,14 +66,16 @@ export async function GET(request: Request) {
       whereClause += ` AND (
         s.keyword LIKE ? OR
         u.id LIKE ? OR 
-        s.singleLink LIKE ?
+        s.singleLink LIKE ? OR
+        s.comparePriceLink LIKE ? OR
+        s.mid LIKE ?
       )`;
       params.push(
         `%${keyword}%`,
         `%${keyword}%`,
         `%${keyword}%`,
         `%${keyword}%`,
-        `%${keyword}%`,
+        `%${keyword}%`
       );
     }
 
@@ -219,6 +221,7 @@ export async function GET(request: Request) {
         s.rank,
         s.memo,
         s.singleLink,
+        s.comparePriceLink,
         s.errMsg,
         s.mid,
         IF(sr.seq IS NOT NULL, 1, 0) as hasRanking
@@ -305,7 +308,7 @@ export async function POST(request: Request) {
     const [result] = await pool.query<ResultSetHeader>(query, [values]);
 
     const logQuery = `
-     INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day,adjustmentPrice,adjustmentPriceAgency,adjustmentPriceUser)
+     INSERT INTO Log (type,created_at,agency,distributor,user,slot_seq,start_at,end_at,adjustment_day)
      VALUES ?
     `; // 로그 추가 
 
@@ -333,56 +336,7 @@ export async function POST(request: Request) {
       `, [slot.userId]);
 
       
-      let price = 0;
-      let agencyPrice = 0;
-      let userPrice = 0;
 
-      let adjustmentPrice =0;
-      let adjustmentPriceAgency = 0;
-      let adjustmentPriceUser = 0;
-
-
-
-      if (user) {
-          if (user.role ===0 || user.role === 1) {
-            // 대리점이면 본인 가격 사용
-            price = user.price ?? 0;
-
-          } else if (user.role == 2) {
-            const [[distributor]] = await pool.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.distributorId]);
-
-            
-
-            price = distributor?.price ?? 0;
-            agencyPrice = user.price ?? 0;;
-            
-          } else if (user.role ==3){
-            const [[distributor]] = await pool.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.distributorId]);
-
-            const [[agency]] = await pool.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.agencyId]);
-
-            
-            price = distributor?.price ?? 0;
-            agencyPrice = agency?.price ?? 0;
-            userPrice = user.price ?? 0;
-          }
-        }
-
-      adjustmentPrice = price * adjustmentDay;
-      adjustmentPriceAgency = agencyPrice * adjustmentDay;
-      adjustmentPriceUser = userPrice * adjustmentDay;
 
       // logValue 구성
       logValues.push([
@@ -395,9 +349,6 @@ export async function POST(request: Request) {
         slot.startDate,
         slot.endDate,
         adjustmentDay,
-        adjustmentPrice,
-        adjustmentPriceAgency,
-        adjustmentPriceUser
       ]);
     }
       
@@ -420,7 +371,7 @@ export async function PUT(request: Request) {
 
 
     const body = await request.json();
-    const { seqs, keyword, memo ,singleLink, mid} = body;
+    const { seqs, keyword, memo ,singleLink, mid, comparePriceLink} = body;
 
     if (!Array.isArray(seqs) || seqs.length === 0) {
       return NextResponse.json({ error: '수정할 슬롯 ID 목록이 없습니다.' }, { status: 400 });
@@ -429,7 +380,7 @@ export async function PUT(request: Request) {
 
 
     const [rows] = await pool.query<any[]>(
-      `SELECT seq, keyword, singleLink, memo, mid FROM Slot WHERE seq IN (${seqs.map(() => '?').join(',')})`,
+      `SELECT seq, keyword, singleLink, memo, mid, comparePriceLink FROM Slot WHERE seq IN (${seqs.map(() => '?').join(',')})`,
       seqs
     );
     // 실제 수정할 값 계산
@@ -442,7 +393,8 @@ export async function PUT(request: Request) {
         (keyword !== undefined && keyword !== row.keyword) ||
         (singleLink !== undefined && singleLink !== row.singleLink) ||
         (memo !== undefined && memo !== row.memo) ||
-        (mid !== undefined && mid !== row.mid)
+        (mid !== undefined && mid !== row.mid) ||
+        (comparePriceLink !== undefined && comparePriceLink !== row.comparePriceLink)
       ) {
         hasChanges = true;
         break;
@@ -451,7 +403,7 @@ export async function PUT(request: Request) {
 
     for (const row of rows) { // 데이터 null 비초기화 조건 검사 
       const isSingleLinkSame = singleLink === undefined || singleLink === row.singleLink;
-      const isDifferent = ((memo !== undefined && memo !== row.memo)  || (keyword !== undefined && keyword !== row.keyword) || (mid !== undefined && mid !== row.mid)); // 키워드 , 메모 동시 체크 
+      const isDifferent = ((memo !== undefined && memo !== row.memo)  || (keyword !== undefined && keyword !== row.keyword) || (mid !== undefined && mid !== row.mid) || (comparePriceLink !== undefined && comparePriceLink !== row.comparePriceLink)); // 키워드 , 메모 동시 체크 
       if (
         isSingleLinkSame &&
         isDifferent
@@ -486,6 +438,10 @@ export async function PUT(request: Request) {
     if (mid !== undefined) {
       fields.push('mid = ?');
       values.push(mid);
+    }
+    if (comparePriceLink !== undefined) {
+      fields.push('comparePriceLink = ?');
+      values.push(comparePriceLink);
     }
 
 

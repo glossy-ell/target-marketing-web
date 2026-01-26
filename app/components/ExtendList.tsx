@@ -510,7 +510,7 @@ const ExtendList = () => {
         <div className="flex items-center gap-2 w-[450px]">
           <input
             type="text"
-            placeholder="아이디, 키워드, 상품명, 프로덕트, 벤더"
+            placeholder="아이디, 키워드, 상품명, 링크,MID"
             className="bg-white text-black border text-xs border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#282828] w-full"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}

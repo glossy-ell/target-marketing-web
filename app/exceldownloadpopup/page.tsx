@@ -24,6 +24,7 @@ interface Slot {
   rank: number;
   memo: string;
   singleLink: string;
+  comparePriceLink: string | null;
   hasRanking: number;
   createdAt: string;
   errMsg: string;
@@ -211,24 +212,6 @@ const SlotList = () => {
   };
 
 
-
-
-
- 
-
-    const headerMapKeyword: Record<string, string> = {
-      "타입": "타입",
-      "상품 링크": "상품 링크",
-      "시작 날짜": "시작 날짜",
-      "종료 날짜": "종료 날짜",
-      "검색어": "검색어",
-      "MID": "MID",
-    };
-
-
-
-
-
     const convertSlotsToExcelData = (slots: Slot[], customMode: number = 0) => {
         const result: any[] = [];
 
@@ -259,14 +242,29 @@ const SlotList = () => {
           }
         }
 
-        const baseRow = {
+        const baseRow: any = {
           '타입': '리워드',
-          '상품 링크': slot.singleLink ?? '',
-          '시작 날짜': formatDate(new Date(displayStartTime).toISOString()),
-          '종료 날짜': formatDate(new Date(displayEndTime).toISOString()),
-          '검색어': slot.keyword ?? '',
-          'MID': slot.mid ?? '',
         };
+
+        // isAdmin일 때 총판 ID 추가
+        if (isAdmin) {
+          baseRow['총판 ID'] = slot.distributorId || '-';
+        }
+
+        // isAdmin 또는 isDistributor일 때 대행 ID 추가
+        if (isAdmin || isDistributor) {
+          baseRow['대행 ID'] = slot.agencyId || '-';
+        }
+
+        // 항상 포함되는 필드
+        baseRow['클라이언트 ID'] = slot.userId || '-';
+        baseRow['키워드'] = slot.keyword ?? '';
+        baseRow['상품 링크'] = slot.singleLink ?? '';
+        baseRow['가격비교링크'] = slot.comparePriceLink ?? '-';
+        baseRow['MID'] = slot.mid ?? '';
+        baseRow['시작일'] = formatDate(new Date(displayStartTime).toISOString());
+        baseRow['종료일'] = formatDate(new Date(displayEndTime).toISOString());
+
         result.push(baseRow);
       });
         return result;
@@ -296,11 +294,13 @@ const SlotList = () => {
 
         // 엑셀 다운로드
         const keywordData = convertSlotsToExcelData(targetSlot);
-        const keywordHeaders = Object.entries(headerMapKeyword);
+        
+        // 첫 번째 행의 키를 헤더로 사용
+        const keywordHeaders = keywordData.length > 0 ? Object.keys(keywordData[0]) : [];
 
         const keywordSheetData = [
-          keywordHeaders.map(([_, desc]) => desc),
-          ...keywordData.map(row => keywordHeaders.map(([key]) => row[key] ?? ''))
+          keywordHeaders,
+          ...keywordData.map(row => keywordHeaders.map(key => row[key] ?? ''))
         ];
 
         const keywordWorkSheet = XLSX.utils.aoa_to_sheet(keywordSheetData);
@@ -342,20 +342,25 @@ const SlotList = () => {
           });
         });
 
-        keywordWorkSheet['!cols'] = [
-          { wch: 15 },   // 타입
-          { wch: 60 },   // 상품링크
-          { wch: 15 },   // 시작일
-          { wch: 15 },   // 종료일
-          { wch: 20 },   // 검색어
-          { wch: 30 },   // MID
-        ];
+        // 동적 컬럼 너비 설정
+        const colWidths = keywordHeaders.map(header => {
+          if (header === '타입') return { wch: 10 };
+          if (header === '총판 ID' || header === '대행 ID') return { wch: 20 };
+          if (header === '클라이언트 ID') return { wch: 20 };
+          if (header === '키워드') return { wch: 25 };
+          if (header === '상품 링크' || header === '가격비교링크') return { wch: 60 };
+          if (header === 'MID') return { wch: 30 };
+          if (header === '시작일' || header === '종료일') return { wch: 15 };
+          if (header === '메모') return { wch: 30 };
+          return { wch: 15 };
+        });
+        keywordWorkSheet['!cols'] = colWidths;
 
         const now = new Date();
-        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
         const keywordWorkbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(keywordWorkbook, keywordWorkSheet, 'my_sheet');
-        XLSX.writeFile(keywordWorkbook, `타겟 마케팅 -${dateStr}.xlsx`);
+        XLSX.writeFile(keywordWorkbook, `타겟 마케팅 ${dateStr}.xlsx`);
     };
 
 

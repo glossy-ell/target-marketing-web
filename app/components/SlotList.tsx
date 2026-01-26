@@ -22,6 +22,7 @@ interface Slot {
   rank: number;
   memo: string;
   singleLink: string;
+  comparePriceLink: string | null;
   hasRanking: number;
   createdAt: string;
   errMsg: string;
@@ -224,9 +225,12 @@ const SlotList = (   {
     const editStartTime = time?.edit_start_time || "23:59:59";
     const editEndTime = time?.edit_end_time || "00:00:00";
 
-    if(nowTime< editStartTime || nowTime>editEndTime){
-      alert(`현시각에는 수정이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
-      return;
+    // 관리자가 아닌 경우에만 시간 체크
+    if(currentUser?.role !== 0) {
+      if(nowTime< editStartTime || nowTime>editEndTime){
+        alert(`현시각에는 수정이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
+        return;
+      }
     }
 
 
@@ -368,9 +372,12 @@ const SlotList = (   {
     const editStartTime = time?.edit_start_time || "23:59:59";
     const editEndTime = time?.edit_end_time || "00:00:00";
 
-    if(nowTime< editStartTime || nowTime>editEndTime){
-      alert(`현시각에는 삭제가 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
-      return;
+    // 관리자가 아닌 경우에만 시간 체크
+    if(currentUser?.role !== 0) {
+      if(nowTime< editStartTime || nowTime>editEndTime){
+        alert(`현시각에는 삭제가 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
+        return;
+      }
     }
 
 
@@ -432,9 +439,12 @@ const SlotList = (   {
     const editStartTime = time?.edit_start_time || "23:59:59";
     const editEndTime = time?.edit_end_time || "00:00:00";
 
-    if(nowTime< editStartTime || nowTime>editEndTime){
-      alert(`현시각에는 삭제가 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
-      return;
+    // 관리자가 아닌 경우에만 시간 체크
+    if(currentUser?.role !== 0) {
+      if(nowTime< editStartTime || nowTime>editEndTime){
+        alert(`현시각에는 삭제가 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
+        return;
+      }
     }
     if (selectedIds.length === 0) {
       await MySwal.fire({
@@ -521,9 +531,12 @@ const SlotList = (   {
     const editStartTime = time?.edit_start_time || "23:59:59";
     const editEndTime = time?.edit_end_time || "00:00:00";
 
-    if(nowTime< editStartTime || nowTime>editEndTime){
-      alert(`현시각에는 수정이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
-      return;
+    // 관리자가 아닌 경우에만 시간 체크
+    if(currentUser?.role !== 0) {
+      if(nowTime< editStartTime || nowTime>editEndTime){
+        alert(`현시각에는 수정이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
+        return;
+      }
     }
 
       const isWeekend = (day === 0 || day === 6);
@@ -548,16 +561,24 @@ const SlotList = (   {
       html:
         `<input id="swal-input1" class="swal2-input" placeholder="키워드">` +
         `<input id="swal-input2" class="swal2-input" placeholder="상품 링크">` +
-        `<input id="swal-input3" class="swal2-input" placeholder="MID">`,
+        `<input id="swal-input3" class="swal2-input" placeholder="가격비교링크">` +
+        `<input id="swal-input4" class="swal2-input" placeholder="MID">`,
       focusConfirm: false,
       didOpen: () => {
         const singleLinkInput = document.getElementById('swal-input2') as HTMLInputElement;
-        const midInput = document.getElementById('swal-input3') as HTMLInputElement;
+        const comparePriceLinkInput = document.getElementById('swal-input3') as HTMLInputElement;
+        const midInput = document.getElementById('swal-input4') as HTMLInputElement;
 
         singleLinkInput.addEventListener('input', () => {
           const rawValue = singleLinkInput.value;
           const trimmedValue = rawValue.trim();
           singleLinkInput.value = trimmedValue;  // 입력란에도 공백 제거 반영
+        });
+
+        comparePriceLinkInput.addEventListener('input', () => {
+          const rawValue = comparePriceLinkInput.value;
+          const trimmedValue = rawValue.trim();
+          comparePriceLinkInput.value = trimmedValue;
         });
 
         midInput.addEventListener('input', () => {
@@ -570,9 +591,10 @@ const SlotList = (   {
       preConfirm: () => {
         const keyword = (document.getElementById('swal-input1') as HTMLInputElement).value.trim();
         const singleLink = (document.getElementById('swal-input2') as HTMLInputElement).value.trim();
-        const mid = (document.getElementById('swal-input3') as HTMLInputElement).value.trim();
+        const comparePriceLink = (document.getElementById('swal-input3') as HTMLInputElement).value.trim();
+        const mid = (document.getElementById('swal-input4') as HTMLInputElement).value.trim();
 
-        if (!singleLink && !keyword && !mid) {
+        if (!singleLink && !keyword && !comparePriceLink && !mid) {
           MySwal.showValidationMessage('최소 하나는 입력해야 합니다.');
           return null;
         }
@@ -580,6 +602,7 @@ const SlotList = (   {
         return {
           ...(singleLink && { singleLink }),
           ...(keyword && { keyword }),
+          ...(comparePriceLink && { comparePriceLink }),
           ...(mid && { mid }),
         };
       },
@@ -627,9 +650,12 @@ const SlotList = (   {
     const editStartTime = time?.edit_start_time || "23:59:59";
     const editEndTime = time?.edit_end_time || "00:00:00";
 
-    if(nowTime< editStartTime || nowTime>editEndTime){
-      alert(`현시각에는 연장이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
-      return;
+    // 관리자가 아닌 경우에만 시간 체크
+    if(currentUser?.role !== 0) {
+      if(nowTime< editStartTime || nowTime>editEndTime){
+        alert(`현시각에는 연장이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
+        return;
+      }
     }
 
     if (selectedIds.length === 0) {
@@ -729,9 +755,12 @@ const SlotList = (   {
       const editStartTime = time?.edit_start_time || "23:59:59";
       const editEndTime = time?.edit_end_time || "00:00:00";
 
-      if (nowTime < editStartTime || nowTime > editEndTime) {
-        alert(`현시각에는 연장이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
-        return;
+      // 관리자가 아닌 경우에만 시간 체크
+      if(currentUser?.role !== 0) {
+        if (nowTime < editStartTime || nowTime > editEndTime) {
+          alert(`현시각에는 연장이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${editStartTime} ~ ${editEndTime}`);
+          return;
+        }
       }
       const {isConfirmed, value: daysToExtend } = await MySwal.fire({
         title: '연장할 일수를 입력하세요',
@@ -1082,7 +1111,7 @@ const SlotList = (   {
         <div className="flex items-center gap-2 w-[750px]">
           <input
             type="text"
-            placeholder="아이디, 키워드, 상품명, 프로덕트, 벤더"
+            placeholder="아이디, 키워드, 상품명, 링크,벤더"
             className="bg-white text-black border text-xs border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#282828] w-full"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}

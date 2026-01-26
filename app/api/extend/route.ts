@@ -61,12 +61,17 @@ export async function GET(request: Request) {
     if (keyword) {
       whereClause += ` AND (
         s.keyword LIKE ? OR
-        u.id LIKE ?
+        u.id LIKE ? OR
+        s.singleLink LIKE ? OR
+        s.comparePriceLink LIKE ? OR
+        s.mid LIKE ?
       )`;
       params.push(
         `%${keyword}%`,
         `%${keyword}%`,
         `%${keyword}%`,
+        `%${keyword}%`,
+        `%${keyword}%`
       );
     }
 
@@ -242,48 +247,10 @@ export async function PUT(request: Request) {
 
       // 클라이언트 정보 조회
       const [[user]] = await connection.query<any[]>(
-        `SELECT role, price, distributorId, agencyId FROM User WHERE seq = ?`,
+        `SELECT role, distributorId, agencyId FROM User WHERE seq = ?`,
         [slot.userId]
       );
 
-      let price = 0;
-      let agencyPrice = 0;
-      let userPrice = 0;
-
-      if (user) {
-        if (user.role === 0 || user.role === 1) {
-          price = user.price ?? 0;
-        } else if (user.role === 2) {
-          const [[distributor]] = await connection.query<any[]>(
-            `SELECT price FROM User WHERE seq = ?`,
-            [user.distributorId]
-          );
-          const [[agency]] = await connection.query<any[]>(
-            `SELECT price FROM User WHERE seq = ?`,
-            [user.agencyId]
-          );
-
-          price = distributor?.price ?? 0;
-          agencyPrice = user.price ?? 0;
-        } else if (user.role === 3) {
-          const [[distributor]] = await connection.query<any[]>(
-            `SELECT price FROM User WHERE seq = ?`,
-            [user.distributorId]
-          );
-          const [[agency]] = await connection.query<any[]>(
-            `SELECT price FROM User WHERE seq = ?`,
-            [user.agencyId]
-          );
-
-          price = distributor?.price ?? 0;
-          agencyPrice = agency?.price ?? 0;
-          userPrice = user.price ?? 0;
-        }
-      }
-
-      const adjustmentPrice = price * adjustmentDay;
-      const adjustmentPriceAgency = agencyPrice * adjustmentDay;
-      const adjustmentPriceUser = userPrice * adjustmentDay;
 
       // 연장 시작일 계산 (주의: slot.endDate는 이미 연장된 상태)
       const extendedStartDate = new Date(
@@ -304,17 +271,13 @@ export async function PUT(request: Request) {
         extendedStartDate,
         slot.endDate,
         adjustmentDay,
-        adjustmentPrice,
-        adjustmentPriceAgency,
-        adjustmentPriceUser,
       ]);
     }
     // 로그 저장
     const logQuery = `
       INSERT INTO Log (
         type, created_at, agency, distributor, user, slot_seq,
-        start_at, end_at, adjustment_day,
-        adjustmentPrice, adjustmentPriceAgency, adjustmentPriceUser
+        start_at, end_at, adjustment_day
       ) VALUES ?
     `;
     await connection.query(logQuery, [logValues]);

@@ -11,7 +11,6 @@ interface StatsProps {
   totalSettleCount: number;
   
   totalSettlementPrice: number;
-  totalRefundPrice: number;
 
 
   searchTotalIssued: boolean;
@@ -36,9 +35,6 @@ export default function TransactionSummaryCards({
   totalCancelCount,
   totalSettleCount,
   totalSettlementPrice,
-  totalRefundPrice,
-
-
 
   searchTotalIssued,
   searchTotalRefund,
@@ -104,21 +100,6 @@ export default function TransactionSummaryCards({
           setPage(1);
         },
       },
-      // {
-      //   label: '정산',
-      //   value: totalSettleCount,
-      //   desc: '정산된 내역 슬롯 개수',
-      //   // onClick: () => {
-      //   //   setSearchTotalIssued(false);
-      //   //   setSearchTotalRefund(false);
-      //   //   setSearchTotalCancel(false);
-      //   //   setSearchTotalSettle(true);
-      //   //   setPage(1);
-      //   // },
-      // },
-
-      // { label: '정산가', value: totalSettlementPrice, desc: '총 정산가격' },
-      // { label: '환불가', value: totalRefundPrice, desc: '총 환불가격' }
     ];
 
 

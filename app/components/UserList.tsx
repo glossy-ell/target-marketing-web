@@ -501,14 +501,14 @@ const UserList = () => {
             className="border p-2"
           />
 
-          <input
+          {/* <input
             type="number"
             name="price"
             placeholder="단가"
             value={formData.price || ""}
             onChange={handleInputChange}
             className="border p-2"
-          />
+          /> */}
           <select
             name="role"
             value={formData.role}

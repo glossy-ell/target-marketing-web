@@ -4,6 +4,14 @@ import { Button } from '@/components/ui/button';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import React from 'react';
 
+// URL을 절대 경로로 정규화합니다. 프로토콜이 없으면 https:// 를 붙입니다.
+const normalizeUrl = (url?: string | null) => {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+};
+
 interface Slot {
   seq: number;
   mid: string | null;
@@ -16,6 +24,7 @@ interface Slot {
   rank: number;
   memo: string;
   singleLink: string;
+  comparePriceLink: string | null;
   hasRanking: number;
   createdAt: string;
   errMsg: string;
@@ -147,6 +156,7 @@ const SlotTable: React.FC<SlotTableProps> = ({
             <th className="px-5 py-4 border-b border-gray-300">클라이언트 ID</th>
             <th className="px-5 py-4 border-b border-gray-300">키워드</th>
             <th className="px-5 py-4 border-b border-gray-300">상품 링크</th>
+            <th className="px-5 py-4 border-b border-gray-300">가격비교링크</th>
             <th className="px-5 py-4 border-b border-gray-300">MID</th>
             <th className="px-5 py-4 border-b border-gray-300">시작일</th>
             <th className="px-5 py-4 border-b border-gray-300">종료일</th>
@@ -371,7 +381,7 @@ const SlotTable: React.FC<SlotTableProps> = ({
                       <Tooltip.Root>
                         <Tooltip.Trigger asChild>
                           <a
-                            href={slot.singleLink}
+                            href={normalizeUrl(slot.singleLink) || '#'}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-purple-700 hover:underline truncate inline-block max-w-[100px] cursor-pointer"
@@ -400,7 +410,46 @@ const SlotTable: React.FC<SlotTableProps> = ({
                     {isEditing && handleInputChange ? (
                       <input
                         className="bg-white text-black border border-gray-300 px-3 py-1 w-full rounded-md"
+                        value={editedSlot.comparePriceLink || ''}
+                        onChange={(e) =>
+                          handleInputChange('comparePriceLink', e.target.value)
+                        }
+                      />
+                    ) : slot.comparePriceLink ? (
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <a
+                            href={normalizeUrl(slot.comparePriceLink) || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-purple-700 hover:underline truncate inline-block max-w-[100px] cursor-pointer"
+                          >
+                            {slot.comparePriceLink}
+                          </a>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content
+                            side="top"
+                            className="bg-black text-white p-2 rounded text-xs whitespace-pre-wrap w-full"
+                            sideOffset={5}
+                          >
+                            {slot.comparePriceLink}
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                </Tooltip.Provider>
+
+                <Tooltip.Provider delayDuration={100}>
+                  <td className="p-3 border-b border-gray-200 max-w-xs break-words">
+                    {isEditing && handleInputChange ? (
+                      <input
+                        className="bg-white text-black border border-gray-300 px-3 py-1 w-full rounded-md"
                         value={editedSlot.mid || ''}
+                        placeholder='가격비교일경우 가격비교MID 입력'
                         onChange={(e) =>
                           handleInputChange('mid', e.target.value)
                         }

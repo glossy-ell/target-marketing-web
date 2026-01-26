@@ -242,7 +242,7 @@ export default function AgencyConfig(props: Props) {
               <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>사용자 추가</th>
               <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>엑셀 허용</th>
               <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>순위조회 허용</th>
-              <th className="px-5 py-4 border-b border-gray-300">단가</th>
+              {/* <th className="px-5 py-4 border-b border-gray-300">단가</th> */}
               <th className="px-5 py-4 border-b border-gray-300">전체 사용자</th>
               <th className="px-5 py-4 border-b border-gray-300">슬롯 합계</th>
             </tr>

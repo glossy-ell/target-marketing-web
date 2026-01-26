@@ -136,13 +136,7 @@ export async function POST(request: NextRequest, { params }: { params: { page: s
         l.adjustment_day AS adjustmentDay,
         l.slot_seq AS slotSeq,
         l.start_at AS startAt,
-        l.end_at AS endAt,
-        l.adjustmentPrice,
-        l.adjustmentPriceAgency,
-        l.adjustmentPriceUser,
-        l.refundPrice,
-        l.refundPriceAgency,
-        l.refundPriceUser
+        l.end_at AS endAt
       FROM Log l 
       LEFT JOIN \`User\` u ON l.user = u.seq
       LEFT JOIN \`User\` a ON l.agency = a.seq
@@ -232,64 +226,7 @@ export async function POST(request: NextRequest, { params }: { params: { page: s
     const totalSettlement = Math.max(0, totalIssuedCount - totalRefundCount - totalCancelCount);
 
 
-    //가격 합계 구하기
-   const issuedSumBaseQuery = `
-    SELECT 
-      SUM(l.adjustmentPrice) AS totalAdjustmentPrice,
-      SUM(l.adjustmentPriceAgency) AS totalAdjustmentPriceAgency,
-      SUM(l.adjustmentPriceUser) AS totalAdjustmentPriceUser
-    FROM Log l
-    LEFT JOIN \`User\` u ON l.user = u.seq
-    LEFT JOIN \`User\` a ON l.agency = a.seq
-    LEFT JOIN \`User\` d ON l.distributor = d.seq
-  `;
-
-    let issuedSumWhereClause = `${whereClause}  AND l.type = 1`;
-    if (conditionMap[role]) {
-      issuedSumWhereClause += ` AND ${conditionMap[role]}`;
-    }
-    const issuedSumParams = role === 0
-      ? [...sqlParams]
-      : [...sqlParams, ...(role === 3 ? [seq] : [seq, seq])];
-
-    const issuedSumQuery = issuedSumBaseQuery + '\n' + issuedSumWhereClause;
-
-  
-    const [issuedSumRows]: [any[], any] = await pool.query(issuedSumQuery, issuedSumParams);
-
-    const totalIssuedSum = Number(issuedSumRows[0]?.totalAdjustmentPrice ?? 0);
-    const totalIssuedSumAgency = Number(issuedSumRows[0]?.totalAdjustmentPriceAgency ?? 0);
-    const totalIssuedSumUser = Number(issuedSumRows[0]?.totalAdjustmentPriceUser ?? 0);
-
-
-    const refundSumBaseQuery = `
-      SELECT 
-      SUM(l.refundPrice) AS totalRefundPrice,
-      SUM(l.refundPriceAgency) AS totalRefundPriceAgency,
-      SUM(l.refundPriceUser) AS totalRefundPriceUser
-      FROM Log l
-      LEFT JOIN \`User\` u ON l.user = u.seq
-      LEFT JOIN \`User\` a ON l.agency = a.seq
-      LEFT JOIN \`User\` d ON l.distributor = d.seq
-     `;
-    
-    let refundSumWhereClause = `${whereClause}  AND (l.type = 3 OR l.type = 4 )`;
-    if (conditionMap[role]) {
-      refundSumWhereClause += ` AND ${conditionMap[role]}`;
-    }
-    const refundSumParams = role === 0
-      ? [...sqlParams]
-      : [...sqlParams, ...(role === 3 ? [seq] : [seq, seq])];
-
-    const refundSumQuery = refundSumBaseQuery + '\n' + refundSumWhereClause;
-
-  
-    const [refundSumRows]: [any[], any] = await pool.query(refundSumQuery, refundSumParams);
-
-    const refundIssuedSum = Number(refundSumRows[0]?.totalRefundPrice ?? 0);
-    const refundIssuedSumAgency = Number(refundSumRows[0]?.totalRefundPriceAgency ?? 0);
-    const refundIssuedSumUser = Number(refundSumRows[0]?.totalRefundPriceUser ?? 0);
-
+   
 
 
     return NextResponse.json({ 
@@ -299,12 +236,6 @@ export async function POST(request: NextRequest, { params }: { params: { page: s
       totalRefundCount,
       totalCancelCount,
       totalSettlement,
-      totalIssuedSum,
-      totalIssuedSumAgency,
-      totalIssuedSumUser,
-      refundIssuedSum,
-      refundIssuedSumAgency,
-      refundIssuedSumUser,
     });
 
   } catch (error: any) {

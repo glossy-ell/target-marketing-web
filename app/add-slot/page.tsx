@@ -186,10 +186,12 @@ export default function AddSlot() {
       return;
     }
 
-
-    if(nowTime< openStartTime || nowTime>openEndTime){
-      alert(`현시각에는 추가작업이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${openStartTime} ~ ${openEndTime}`);
-      return;
+    // 관리자가 아닌 경우에만 시간 체크
+    if(currentUser?.role !== 0) {
+      if(nowTime< openStartTime || nowTime>openEndTime){
+        alert(`현시각에는 추가작업이 불가능합니다.\n현재 시간: ${nowTime}\n작업 가능 시간: ${openStartTime} ~ ${openEndTime}`);
+        return;
+      }
     }
 
     // const isWeekend = (day === 0 || day === 6);
