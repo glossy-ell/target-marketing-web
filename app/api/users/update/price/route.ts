@@ -4,7 +4,7 @@ import pool from 'lib/db';
 //  총판 및 대행 수정 API
 export async function PUT(request: Request) {
   try {
-    const { userSeq, editorSeq, price} = await request.json();
+    const { userSeq, editorSeq } = await request.json();
 
     if (!userSeq || !editorSeq) {
       return NextResponse.json({ message: 'userSeq와 editorSeq가 필요합니다.' }, { status: 400 });
@@ -32,8 +32,6 @@ export async function PUT(request: Request) {
     const updateFields: string[] = [];
     const updateValues: any[] = [];
 
-       updateFields.push('price = ?');
-    updateValues.push(price);
     
 
 

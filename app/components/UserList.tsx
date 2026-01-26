@@ -25,7 +25,6 @@ interface User {
   agencyCount : number;
   userCount : number;
   slotCount : number;
-  price: number;
 }
 
 interface Agency {
@@ -68,7 +67,6 @@ const UserList = () => {
     slotAllow: 0,
     userAllow: 0,
     rankingCheckAllow: 0,
-    price: 0,
   });
 
   const [configData, setConfigData] = useState({
@@ -391,7 +389,6 @@ const UserList = () => {
             userAllow: formData.userAllow,
             slotAllow: formData.slotAllow,
             rankingCheckAllow: formData.rankingCheckAllow,
-            price:formData.price,
           }),
 
         });
@@ -428,7 +425,6 @@ const UserList = () => {
       agencySeq: user.agencySeq ? String(user.agencySeq) : '',
       distributorSeq: user.distributorSeq ? String(user.distributorSeq) : '',
       seq: user.seq,
-      price: user.price
     });
 
     const selectedDistributor = distributorList.find((dist: any) => dist.seq === user.distributorSeq);
@@ -500,15 +496,6 @@ const UserList = () => {
             onChange={handleInputChange}
             className="border p-2"
           />
-
-          {/* <input
-            type="number"
-            name="price"
-            placeholder="단가"
-            value={formData.price || ""}
-            onChange={handleInputChange}
-            className="border p-2"
-          /> */}
           <select
             name="role"
             value={formData.role}
@@ -723,7 +710,6 @@ const UserList = () => {
                   rankingCheckAllow:0,
                   distributorSeq: '',
                   seq: 0,
-                  price: 0,
                 });
               }}
               className="ml-2 text-gray-600 underline"

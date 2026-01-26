@@ -20,7 +20,6 @@ interface User {
   agencyCount : number;
   userCount : number;
   slotCount : number;
-  price:number;
 }
 
 type Props = {
@@ -42,7 +41,6 @@ export default function AgencyConfig(props: Props) {
   const [slotLocalSwitchState, setSlotLocalSwitchState] = useState<{ [key: number]: boolean }>({});
   const [userLocalSwitchState, setUserLocalSwitchState] = useState<{ [key: number]: boolean }>({});
   const [editRow, setEditRow] = useState<number | null>(null);
-  const [price,setPrice] = useState<number>(-1);
 
   useEffect(() => {
      const fetchCurrentUser = async () => {
@@ -68,8 +66,7 @@ export default function AgencyConfig(props: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userSeq: seq,
-          editorSeq: currentUser.seq,
-          price: price,
+          editorSeq: currentUser.seq
         }),
       });
 
@@ -242,7 +239,6 @@ export default function AgencyConfig(props: Props) {
               <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>사용자 추가</th>
               <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>엑셀 허용</th>
               <th className="px-5 py-4 border-b border-gray-300" style={{ display: currentUser?.role === 0  ? '' : 'none' }}>순위조회 허용</th>
-              {/* <th className="px-5 py-4 border-b border-gray-300">단가</th> */}
               <th className="px-5 py-4 border-b border-gray-300">전체 사용자</th>
               <th className="px-5 py-4 border-b border-gray-300">슬롯 합계</th>
             </tr>
@@ -333,58 +329,7 @@ export default function AgencyConfig(props: Props) {
                     <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 peer-checked:translate-x-5"></div>
                   </label>
                 </td>
-                <td className="border p-2">
-                  <div>
-                    {editRow === user.seq ? (
-                      <>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          value={price}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^\d*$/.test(value)) {
-                              setPrice(Number(value));
-                            }
-                          }}
-                          className="border rounded px-1 py-0.5 text-sm"
-                        />
-                        <button
-                          style={{ display: (currentUser!.role === 0 || currentUser!.role === 1) ? '' : 'none' }}
-                          onClick={() => {
-                            handleSubmit(user.seq);
-                            setEditRow(null);
-                          }}
-                          className="text-blue-500 underline text-sm ml-2"
-                        >
-                          확인
-                        </button>
-                        <button
-                          style={{ display: (currentUser!.role === 0 || currentUser!.role === 1) ? '' : 'none' }}
-                          onClick={() => setEditRow(null)}
-                          className="text-blue-500 underline text-sm ml-2"
-                        >
-                          취소
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        {user.price}
-                        <button
-                          style={{ display: (currentUser!.role === 0 || currentUser!.role === 1) ? '' : 'none' }}
-                          onClick={() => {
-                            setPrice(user.price);
-                            setEditRow(user.seq);
-                          }}
-                          className="text-[#282828] underline text-sm ml-2"
-                        >
-                          수정
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </td>
+               
                 <td className="border p-2">{user.userCount}</td>
                 <td className="border p-2">{user.slotCount}</td>
               </tr>

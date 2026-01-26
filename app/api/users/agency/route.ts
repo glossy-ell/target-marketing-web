@@ -15,7 +15,6 @@ export async function GET() {
           u.slotAllow,
           u.userAllow,
           u.rankingCheckAllow,
-          u.price,
           u.agencyId AS agencySeq,
           CONCAT(a.id, '(', a.name, ')') AS agencyId,
           u.distributorId AS distributorSeq,

@@ -36,17 +36,18 @@ model User {
 }
 
 model Slot {
-  seq           Int      @id @default(autoincrement()) // 순번 (PK)
-  userId        Int                                   // 사용자 ID (User 테이블 참조)
-  agencyId      Int?                                     // 총판 ID (nullable)
-  distributorId Int?                                     // 유통사 ID (nullable)
-  keyword       String?                                  // 작업 키워드
-  startDate     DateTime                                 // 작업 시작일
-  endDate       DateTime                                 // 작업 종료일
-  rank          Int?                                     // 순위 (nullable)
-  createdAt     DateTime @default(now())                // 생성일
-  memo   String?                                  // 메모
-  mid           String?                                  // MID (nullable)
+  seq              Int      @id @default(autoincrement()) // 순번 (PK)
+  userId           Int                                   // 사용자 ID (User 테이블 참조)
+  agencyId         Int?                                     // 총판 ID (nullable)
+  distributorId    Int?                                     // 유통사 ID (nullable)
+  keyword          String?                                  // 작업 키워드
+  startDate        DateTime                                 // 작업 시작일
+  endDate          DateTime                                 // 작업 종료일
+  rank             Int?                                     // 순위 (nullable)
+  createdAt        DateTime @default(now())                // 생성일
+  memo             String?                                  // 메모
+  mid              String?                                  // MID (nullable)
+  comparePriceLink String?  @db.VarChar(500)               // 가격비교링크 (nullable)
 
   // 관계 설정
   user          User     @relation("UserSlots", fields: [userId], references: [seq], onDelete: Cascade)

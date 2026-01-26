@@ -330,7 +330,7 @@ export async function POST(request: Request) {
 
       // 1. 사용자 정보 조회
       const [[user]] = await pool.query<any[]>(`
-        SELECT role, price, distributorId,agencyId
+        SELECT role, distributorId,agencyId
         FROM User
         WHERE seq = ?
       `, [slot.userId]);

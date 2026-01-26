@@ -61,59 +61,18 @@ export async function DELETE(request: Request) {
 
 
       const [[user]] = await pool.query<any[]>(`
-        SELECT role, price, distributorId,agencyId
+        SELECT role, distributorId,agencyId
         FROM User
         WHERE seq = ?
       `, [targetSlot.userId]);
 
 
-      let price = 0;
-      let agencyPrice = 0;
-      let userPrice = 0;
 
 
 
 
-      if (user) {
-          if (user.role ===0 || user.role === 1) {
-            // 대리점이면 본인 가격 사용
-            price = user.price ?? 0;
 
-          } else if (user.role == 2) {
-            const [[distributor]] = await pool.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.distributorId]);
-
-            const [[agency]] = await pool.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.agencyId]);
-
-            price = distributor?.price ?? 0;
-            agencyPrice = user.price ?? 0;
-            
-          } else if (user.role ==3){
-
-            const [[distributor]] = await pool.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.distributorId]);
-
-            const [[agency]] = await pool.query<any[]>(`
-              SELECT price
-              FROM User
-              WHERE seq = ?
-            `, [user.agencyId]);
-          
-            price = distributor?.price ?? 0;
-            agencyPrice = agency?.price ?? 0;
-            userPrice = user.price ?? 0;
-          }
-        }
+    
 
       const logType = isSameDate(new Date(),targetSlot.createdAt) ? 4:3;
 
@@ -187,7 +146,6 @@ export async function DELETE(request: Request) {
 
       const placeholders = seqs.map(() => '?').join(',');
 
-      let price = 0;
       const logValues: any[] = [];
       for (let i = 0; i < targetSlotRows.length; i++) {
         const slot = targetSlotRows[i];
@@ -197,57 +155,13 @@ export async function DELETE(request: Request) {
 
         // 1. 사용자 정보 조회
         const [[user]] = await pool.query<any[]>(`
-          SELECT role, price, distributorId,agencyId
+          SELECT role, distributorId,agencyId
           FROM User
           WHERE seq = ?
         `, [slot.userId]);
 
-      let price = 0;
-      let agencyPrice = 0;
-      let userPrice = 0;
 
 
-      // 3. price 계산 로직
-      if (user) {
-        if (user.role ===0 || user.role === 1) {
-          // 대리점이면 본인 가격 사용
-          price = user.price ?? 0;
-
-        } else if (user.role == 2) {
-          const [[distributor]] = await pool.query<any[]>(`
-            SELECT price
-            FROM User
-            WHERE seq = ?
-          `, [user.distributorId]);
-
-          const [[agency]] = await pool.query<any[]>(`
-            SELECT price
-            FROM User
-            WHERE seq = ?
-          `, [user.agencyId]);
-
-          price = distributor?.price ?? 0;
-          agencyPrice = user.price ?? 0;
-          
-        } else if (user.role ==3){
-
-          const [[distributor]] = await pool.query<any[]>(`
-            SELECT price
-            FROM User
-            WHERE seq = ?
-          `, [user.distributorId]);
-
-          const [[agency]] = await pool.query<any[]>(`
-            SELECT price
-            FROM User
-            WHERE seq = ?
-          `, [user.agencyId]);
-        
-          price = distributor?.price ?? 0;
-          agencyPrice = agency?.price ?? 0;
-          userPrice = user.price ?? 0;
-        }
-      }
 
    
       

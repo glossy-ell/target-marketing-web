@@ -10,7 +10,7 @@ interface StatsProps {
   totalCancelCount: number;
   totalSettleCount: number;
   
-  totalSettlementPrice: number;
+
 
 
   searchTotalIssued: boolean;
@@ -34,7 +34,6 @@ export default function TransactionSummaryCards({
   totalRefundCount,
   totalCancelCount,
   totalSettleCount,
-  totalSettlementPrice,
 
   searchTotalIssued,
   searchTotalRefund,

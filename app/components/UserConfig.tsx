@@ -20,7 +20,6 @@ interface User {
   agencyCount : number;
   userCount : number;
   slotCount : number;
-  price:number;
 }
 
 type Props = {
@@ -40,7 +39,6 @@ export default function AgencyConfig(props: Props) {
   const [regLocalSwitchState, setRegLocalSwitchState] = useState<{ [key: number]: boolean }>({});
   const [rankingLocalSwitchState, setRankingLocalSwitchState] = useState<{ [key: number]: boolean }>({});
   const [editRow, setEditRow] = useState<number | null>(null);
-  const [price,setPrice] = useState<number>(-1);
 
   useEffect(() => {
      const fetchCurrentUser = async () => {
@@ -72,7 +70,6 @@ export default function AgencyConfig(props: Props) {
           body: JSON.stringify({
             userSeq: seq,
             editorSeq: currentUser.seq,
-            price: price,
           }),
 
         });
@@ -276,59 +273,7 @@ export default function AgencyConfig(props: Props) {
                     <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-[#282828] transition-colors duration-200"></div>
                     <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-200 peer-checked:translate-x-5"></div>
                   </label>
-                </td>
-                <td className="border p-2">
-                    <div>
-                      {editRow === user.seq ? (
-                        <>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            value={price}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (/^\d*$/.test(value)) {
-                                setPrice(Number(value));
-                              }
-                            }}
-                            className="border rounded px-1 py-0.5 text-sm"
-                          />
-                          <button
-                            style={{ display: (currentUser!.role === 0 || currentUser!.role === 1) ? '' : 'none' }}
-                            onClick={() => {
-                              handleSubmit(user.seq);
-                              setEditRow(null);
-                            }}
-                            className="text-blue-500 underline text-sm ml-2"
-                          >
-                            확인
-                          </button>
-                          <button
-                            style={{ display: (currentUser!.role === 0 || currentUser!.role === 1) ? '' : 'none' }}
-                            onClick={() => setEditRow(null)}
-                            className="text-blue-500 underline text-sm ml-2"
-                          >
-                            취소
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          {user.price}
-                          <button
-                            style={{ display: (currentUser!.role === 0 || currentUser!.role === 1) ? '' : 'none' }}
-                            onClick={() => {
-                              setPrice(user.price);
-                              setEditRow(user.seq); // 현재 row만 edit 모드로 설정
-                            }}
-                            className="text-[#282828] underline text-sm ml-2"
-                          >
-                            수정
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
+                </td> 
                 <td className="border p-2">{user.slotCount}</td>
               </tr>
             ))}

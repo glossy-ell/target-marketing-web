@@ -36,40 +36,27 @@ interface Slot {
       "MID": "MID",
     };
 
-    const headerMapKeywordMulti: Record<string, string> = {
-      "슬롯번호": "슬롯번호",
-      "상점명": `상점 명\n(공백 포함 최대 10자까지 노출)\n※ 다음 단어 포함 시 소재 비활성화: 등상품, 위상품, 구매, !, ~, #, 펼치기, 찜하기, 상세, 장바구니, 사러가기클릭, 등클릭, 번째클릭, 스토어클릭, 상품클릭, 클릭+찜`,
-      "랜딩 URL": "랜딩 URL\n아래 6가지 중 택 1\n\n1. https://naver.com\n\n2. https://m.naver.com\n\n3. https://msearch.shopping.naver.com\n\n4. https://search.shopping.naver.com/home\n\n5. https://search.shopping.naver.com/ns\n\n6. https://app.shopping.naver.com/bridge",
-      "시작 날짜": "시작 날짜\nYYYY-MM-DD",
-      "종료 날짜": "종료 날짜\nYYYY-MM-DD",
-      "상품 가격": "상품 가격\n상품 가격을 입력해주세요",
-      "상품 이미지 URL": "상품 이미지\n상품 이미지를 입력해주세요",
-      "검색어": "검색어\n검색어를 입력해주세요. 검색 후 랜딩되는 페이지에 상품이 보이지 않으면 소재가 종료될 수 있어요.",      "MID": "MID\nMID를 입력해주세요",    };
+  function excelSerialToDate(serial: number): Date {
+    const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // 엑셀 기준
+    return new Date(excelEpoch.getTime() + serial * 86400000);
+  }
+  function parseExcelDate(value: any): Date | null {
+    if (!value) return null;
 
-    const headerMapLanding: Record<string, string> = {
-      "슬롯번호": "슬롯번호",
-      '상점명': '상점명\n공백 포함 최대 10자까지 노출',
-      '랜딩 URL': '랜딩 URL\n상품이 검색된 페이지 혹은 상품이 보이는 페이지를 세팅해주세요.',
-      '시작 날짜': '시작 날짜\nYYYY-MM-DD',
-      '종료 날짜': '종료 날짜\nYYYY-MM-DD',
-      '상품 이미지 URL': '상품 이미지 URL\n유저가 눌러야 하는 상품의 대표 이미지 링크를 입력해주세요. \n검색 결과에 노출되는 이미지와 동일해야 해요.',
-      '상품 가격': '상품 가격\n눌러야 하는 상품의 가격을 똑같이 입력해주세요.\n검색 결과에 노출되는 가격과 동일해야 해요.',
-      '상품 URL': '상품 URL\n상품 상세 페이지의 URL을 입력해주세요.',
-      'MID': 'MID\nMID를 입력해주세요',
-    };
+    // 엑셀 serial number
+    if (typeof value === 'number') {
+      return excelSerialToDate(value);
+    }
 
+    // 문자열 날짜
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      const d = new Date(trimmed);
+      if (!isNaN(d.getTime())) return d;
+    }
 
-    const headerMapLandingMulti: Record<string, string> = {
-      "슬롯번호": "슬롯번호",
-      '상점명': '상점명\n공백 포함 최대 10자까지 노출',
-      '랜딩 URL': '랜딩 URL\n상품이 검색된 페이지 혹은 상품이 보이는 페이지를 세팅해주세요.',
-      '시작 날짜': '시작 날짜\nYYYY-MM-DD',
-      '종료 날짜': '종료 날짜\nYYYY-MM-DD',
-      '상품 가격': '상품 가격\n눌러야 하는 상품의 가격을 똑같이 입력해주세요.\n검색 결과에 노출되는 가격과 동일해야 해요.',
-      '상품 이미지 URL': '상품 이미지 URL\n유저가 눌러야 하는 상품의 대표 이미지 링크를 입력해주세요. \n검색 결과에 노출되는 이미지와 동일해야 해요.',
-      'MID': 'MID\nMID를 입력해주세요',
-    };
-
+    return null;
+  }
 export default function ExcelUploadPopupPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -82,133 +69,51 @@ export default function ExcelUploadPopupPage() {
   }, []);
 
   const downloadExcelTemplate = () => {
+    // 확장된 엑셀 템플릿: 업로드에서는 '클라이언트 ID'만 필수로 사용
+      const headers = [
+        '타입',
+        '클라이언트 ID',
+        '개수',
+        '키워드',
+        '상품 링크',
+        '가격비교링크',
+        'MID',
+        '시작일',
+        '종료일',
+        '메모',
+      ];
 
-     Swal.fire({
-              title: '엑셀 옵션을 선택해주세요',
-                  html: `
-                  <div style="display: flex; gap: 20px; justify-content: center; flex-direction: column; align-items: center;">
-                    <div>
-                      <label><input type="radio" name="option" value="1"> 키워드 단일</label>
-                      <label><input type="radio" name="option" value="2"> 키워드 원부</label>
-                      <label><input type="radio" name="option" value="3"> 랜딩 단일</label>
-                      <label><input type="radio" name="option" value="4"> 랜딩 원부</label>
-                    </div>
-                  </div>
-                `,
+    // 두 번째 행에 샘플값: 타입은 '리워드', 클라이언트 ID는 예시로 채워둠. 나머지는 빈칸.
+    const sampleRow = ['리워드', '-', '1', '', '', '', '2000-01-01', '2000-01-01', ''];
+    const sheetData = [headers, sampleRow];
 
-              showCancelButton: true,
-              confirmButtonText: '확인',
-              cancelButtonText: '취소',
-              preConfirm: () => {
-                    const selected = document.querySelector<HTMLInputElement>('input[name="option"]:checked');
-                    if (!selected) {
-                      Swal.showValidationMessage('옵션을 선택해주세요.');
-                      return;
-                    }
+    const sheet = XLSX.utils.aoa_to_sheet(sheetData);
 
+    // 스타일 적용 (헤더)
+    for (let colIdx = 0; colIdx < headers.length; colIdx++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIdx });
+      const cell = sheet[cellAddress];
+      if (cell) {
+        cell.s = {
+          alignment: { wrapText: true, vertical: 'top' },
+          font: { name: '맑은 고딕', sz: 11 }
+        };
+      }
+    }
 
-                  return {
-                     selectedOption: selected.value,
+    // 컬럼 너비 설정
+    sheet['!cols'] = headers.map((h) => {
+      if (h === '클라이언트 ID') return { wch: 30 };
+      if (h === '상품 링크' || h === '가격비교링크' || h === '상품 URL') return { wch: 60 };
+      if (h === '검색어') return { wch: 30 };
+      if (h === '상품 이미지 URL') return { wch: 60 };
+      if (h === '상품 가격') return { wch: 15 };
+      return { wch: 20 };
+    });
 
-                  };
-              }
-            }).then((result) => { // 확인시
-
-              if(result.isConfirmed){
-                if(result.value.selectedOption == "1"){
-                  const headers = Object.entries(headerMapKeyword);
-                  const sheetData = [headers.map(([_, desc]) => desc)];
-
-                  const sheet = XLSX.utils.aoa_to_sheet(sheetData);
-
-                  headers.forEach((_, colIdx) => {
-                    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIdx });
-                    const cell = sheet[cellAddress];
-                    if (cell) {
-                      cell.s = {
-                        alignment: { wrapText: true, vertical: 'top' },
-                        font: { name: '맑은 고딕', sz: 11 }
-                      };
-                    }
-                  });
-
-                  sheet['!cols'] = headers.map(() => ({ wch: 60 }));
-
-                  const workbook = XLSX.utils.book_new();
-                  XLSX.utils.book_append_sheet(workbook, sheet, '엑셀양식');
-                  XLSX.writeFile(workbook, '슬롯_엑셀_양식_키워드_단일.xlsx');
-                }else if(result.value.selectedOption=="2"){
-                  if(result.value.selectedOption == "1"){
-                    const headers = Object.entries(headerMapKeywordMulti);
-                    const sheetData = [headers.map(([_, desc]) => desc)];
-
-                    const sheet = XLSX.utils.aoa_to_sheet(sheetData);
-
-                    headers.forEach((_, colIdx) => {
-                      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIdx });
-                      const cell = sheet[cellAddress];
-                      if (cell) {
-                        cell.s = {
-                          alignment: { wrapText: true, vertical: 'top' },
-                          font: { name: '맑은 고딕', sz: 11 }
-                        };
-                      }
-                    });
-
-                    sheet['!cols'] = headers.map(() => ({ wch: 60 }));
-
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, sheet, '엑셀양식');
-                    XLSX.writeFile(workbook, '슬롯_엑셀_양식_키워드_원부.xlsx');
-                  }
-                }else if(result.value.selectedOption=="3"){
-
-                    const headers = Object.entries(headerMapLanding);
-                    const sheetData = [headers.map(([_, desc]) => desc)];
-
-                    const sheet = XLSX.utils.aoa_to_sheet(sheetData);
-
-                    headers.forEach((_, colIdx) => {
-                      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIdx });
-                      const cell = sheet[cellAddress];
-                      if (cell) {
-                        cell.s = {
-                          alignment: { wrapText: true, vertical: 'top' },
-                          font: { name: '맑은 고딕', sz: 11 }
-                        };
-                      }
-                    });
-
-                    sheet['!cols'] = headers.map(() => ({ wch: 60 }));
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, sheet, '엑셀양식');
-                    XLSX.writeFile(workbook, '슬롯_엑셀_양식_랜딩_단일.xlsx');
-
-                }else if(result.value.selectedOption=="4"){
-                  const headers = Object.entries(headerMapLandingMulti);
-                  const sheetData = [headers.map(([_, desc]) => desc)];
-
-                  const sheet = XLSX.utils.aoa_to_sheet(sheetData);
-
-                  headers.forEach((_, colIdx) => {
-                    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIdx });
-                    const cell = sheet[cellAddress];
-                    if (cell) {
-                      cell.s = {
-                        alignment: { wrapText: true, vertical: 'top' },
-                        font: { name: '맑은 고딕', sz: 11 }
-                      };
-                    }
-                  });
-
-                  sheet['!cols'] = headers.map(() => ({ wch: 60 }));
-
-                  const workbook = XLSX.utils.book_new();
-                  XLSX.utils.book_append_sheet(workbook, sheet, '엑셀양식');
-                  XLSX.writeFile(workbook, '슬롯_엑셀_양식_랜딩_원부.xlsx');
-                }
-              }
-          });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, sheet, '엑셀양식');
+    XLSX.writeFile(workbook, '타겟마케팅_엑셀_양식.xlsx');
   };
 
 
@@ -323,16 +228,93 @@ export default function ExcelUploadPopupPage() {
   }
 };
 
+  // 클라이언트 ID 전용 업로드 처리: '클라이언트 ID' 컬럼만 읽고 /api/users에서 매칭하여 부모 창으로 전달
+  const handleApplyExcelDataClient = async (uploadedData: any[]) => {
+    if (!uploadedData || uploadedData.length === 0) return alert('엑셀 데이터가 없습니다.');
+
+    const firstRow = uploadedData[0] || {};
+    const clientKey = Object.keys(firstRow).find(k => k && k.toString().includes('클라이언트'));
+    if (!clientKey) return alert('엑셀에 "클라이언트 ID" 컬럼이 필요합니다.');
+
+    const firstRowKeys = Object.keys(firstRow);
+
+    // transform uploadedData into rows matching server expected keys
+    const rowsToSend = uploadedData.map((r) => {
+      const map: any = {};
+      // prefer exact keys if present
+      map['타입'] = r['타입'] ?? r['타입'] ?? '';
+      map['총판 ID'] = r['총판 ID'] ?? r['총판 ID'] ?? '';
+      map['대행 ID'] = r['대행 ID'] ?? r['대행 ID'] ?? '';
+      map['클라이언트 ID'] = r['클라이언트 ID'] ?? r['클라이언트'] ?? r['클라이언트 id'] ?? r['ClientId'] ?? '';
+      map['개수'] = r['개수'] ?? r['count'] ?? r['개수'] ?? 1;
+      map['키워드'] = r['키워드'] ?? r['검색어'] ?? '';
+      map['상품 링크'] = r['상품 링크'] ?? r['상품 URL'] ?? '';
+      map['가격비교링크'] = r['가격비교링크'] ?? r['가격비교 링크'] ?? '';
+      map['MID'] = r['MID'] ?? '';
+      // accept either '시작일' or '시작 날짜'
+      map['시작일'] = r['시작일'] ?? r['시작 날짜'] ?? r['시작'] ?? '';
+      map['종료일'] = r['종료일'] ?? r['종료 날짜'] ?? r['종료'] ?? '';
+      map['메모'] = r['메모'] ?? r['memo'] ?? '';
+      return map;
+    });
+
+    // expand rows according to '개수' and validate
+    const expandedRows: any[] = [];
+    for (let i = 0; i < rowsToSend.length; i++) {
+      const map = rowsToSend[i];
+      const rawCount = map['개수'];
+      if (rawCount === undefined || rawCount === null || rawCount === '') {
+        Swal.fire('오류', `행 ${i + 1}: 개수(개수) 값이 비어있습니다.`, 'error');
+        return;
+      }
+      const count = parseInt(String(rawCount), 10);
+      if (isNaN(count) || count <= 0) {
+        Swal.fire('오류', `행 ${i + 1}: 개수는 양의 정수여야 합니다.`, 'error');
+        return;
+      }
+      for (let k = 0; k < count; k++) {
+        expandedRows.push({ ...map });
+      }
+    }
+
+    try {
+      const res = await fetch('/api/slots/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(expandedRows),
+      });
+
+      if (!res.ok) {
+        const { error } = await res.json();
+        Swal.fire('업로드 실패', error || '서버 에러', 'error');
+        return;
+      } else {
+        const result = await res.json();
+        Swal.fire('업로드 완료', `${result.inserted || 0}건 추가되었습니다.`, 'success');
+        if (window.opener) window.opener.postMessage({ type: 'excel-upload-result', data: result }, window.location.origin);
+      }
+    } catch (err) {
+      console.error('업로드 에러:', err);
+      Swal.fire('업로드 오류', '업로드 중 오류가 발생했습니다.', 'error');
+    }
+
+  };
+
   return (
-    <div className="min-h-screen items-center bg-white p-6 text-left">
-      <h1 className="text-2xl font-bold mb-6 text-center">엑셀 업로드</h1>
-      <button
-        className="bg-[#282828] hover:bg-[#141414] text-white px-6 py-3 rounded text-lg mr-2"
-        onClick={downloadExcelTemplate}
-      >
-        엑셀 양식 다운로드
-      </button>
-      <label className="cursor-pointer bg-[#E5E7EB] text-gray-800 hover:bg-gray-300 px-6 py-3 rounded text-lg">
+    <>
+      <div className="min-h-screen items-center bg-white p-6 text-left">
+        <h1 className="text-2xl font-bold mb-6 text-center">엑셀 업로드</h1>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center bg-[#282828] hover:bg-[#141414] text-white px-6 py-3 rounded text-lg mr-2"
+          onClick={downloadExcelTemplate}
+        >
+          엑셀 양식 다운로드
+        </button>
+        <label
+          className="inline-flex items-center justify-center cursor-pointer bg-[#E5E7EB] text-gray-800 hover:bg-gray-300 px-6 py-3 rounded text-lg"
+        >
           엑셀 파일 업로드
           <input
             type="file"
@@ -344,13 +326,12 @@ export default function ExcelUploadPopupPage() {
         </label>
         {uploadedData.length > 0 && (
           <div className="mt-6 w-full max-w-nonetext-sm text-left overflow-auto">
-            <h2 className="font-semibold mb-2">업로드된 데이터 미리보기</h2>
+            <h2 className="font-semibold mb-2">미리보기</h2>
             <table className="table-auto min-w-[900px] border">
               <thead>
                 <tr>
-                  {/* uploadedData의 첫 행의 키들을 헤더로 사용 */}
-                  {Object.keys(uploadedData[0]).map((key) => (
-                    <th key={key} className="border px-2 py-1 bg-gray-100">
+                  {Object.keys(uploadedData[0] || {}).map((key) => (
+                    <th key={key} className="border px-2 py-1 bg-gray-100 text-left">
                       {key}
                     </th>
                   ))}
@@ -359,16 +340,23 @@ export default function ExcelUploadPopupPage() {
               <tbody>
                 {uploadedData.length === 0 ? (
                   <tr>
-                    <td colSpan={Object.keys(uploadedData[0]).length} className="text-center py-4 text-gray-500">
-                      데이터가 없습니다.
-                    </td>
+                    <td className="p-2">데이터가 없습니다.</td>
                   </tr>
                 ) : (
                   uploadedData.map((row, rowIndex) => (
                     <tr key={rowIndex}>
                       {Object.keys(row).map((key) => (
                         <td key={key} className="border px-2 py-1">
-                          {row[key] ?? ""}
+                          {(() => {
+                            const cell = row[key];
+                            if (cell === null || cell === undefined || cell === '') return '';
+                            const lower = key.toString();
+                            if (lower.includes('시작') || lower.includes('종료') || lower.toLowerCase().includes('start') || lower.toLowerCase().includes('end')) {
+                              const d = parseExcelDate(cell);
+                              return d ? d.toISOString().slice(0, 10) : String(cell);
+                            }
+                            return String(cell);
+                          })()}
                         </td>
                       ))}
                     </tr>
@@ -380,14 +368,15 @@ export default function ExcelUploadPopupPage() {
               <button
                 className="inline-block self-start bg-[#282828] hover:bg-[#141414] text-white px-6 py-3 rounded text-lg mr-2  mb-2"
                 onClick={async () => {
-                  await handleApplyExcelData(uploadedData);
+                  await handleApplyExcelDataClient(uploadedData);
                 }}
               >
-                슬롯 수정
+                슬롯 업로드
               </button>
             </div>
           </div>
         )}
-    </div>
+      </div>
+    </>
   );
 }

@@ -1080,6 +1080,7 @@ const SlotList = (   {
       'exceluploadWindow',
       `width=${popupWidth},height=${popupHeight},left=${left},top=${top}`
     );
+ 
   };
 
   const [rankingLoadingSlotSeq, setRankingLoadingSlotSeq] = useState<number | null>(null);
@@ -1164,14 +1165,14 @@ const SlotList = (   {
             엑셀 일부 다운로드
           </button>
           }
-{/*
+
           <button
             style={{ display: currentUser && currentUser.excelAllow === 1 ? '' : 'none' }}
             className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
             onClick={openExcelUploadPopup}
           >
             엑셀 업로드
-          </button> */}
+          </button>
 
         </div>
 

@@ -45,7 +45,6 @@ export async function GET() {
             u.userAllow,
             u.rankingCheckAllow,
             u.agencyId AS agencySeq,
-            u.price,
             CONCAT(a.id, '(', a.name, ')') AS agencyId,
             u.distributorId AS distributorSeq,
             CONCAT(d.id, '(', d.name, ')') AS distributorId,
@@ -182,7 +181,6 @@ export async function POST(request: Request) {
       userAllow,
       agencySeq,
       distributorSeq,
-      price
     } = await request.json();
 
     if (!id || !name || !password || creatorSeq === undefined) {
@@ -244,10 +242,10 @@ export async function POST(request: Request) {
     
     // 유저 추가
     const query = `
-      INSERT INTO \`User\` (id, name, password, role, agencyId, distributorId,excelAllow,rankingCheckAllow,slotAllow,userAllow,price)
+      INSERT INTO \`User\` (id, name, password, role, agencyId, distributorId,excelAllow,rankingCheckAllow,slotAllow,userAllow)
       VALUES (?, ?, ?, ?, ?, ?,?,?,?,?,?)
     `;
-    const params = [id, name, hashedPassword, role, agencyId, distributorId,excelAllow,rankingCheckAllow,slotAllow,userAllow,price];
+    const params = [id, name, hashedPassword, role, agencyId, distributorId,excelAllow,rankingCheckAllow,slotAllow,userAllow];
 
     await pool.query(query, params);
     return NextResponse.json({ message: '유저가 성공적으로 추가되었습니다.' });
