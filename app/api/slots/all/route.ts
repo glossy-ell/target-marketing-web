@@ -104,11 +104,11 @@ export async function GET(request: Request) {
       LEFT JOIN \`User\` a ON s.agencyId = a.seq
       LEFT JOIN \`User\` d ON s.distributorId = d.seq
       LEFT JOIN (
-        SELECT keyword, singleLink, MAX(seq) as seq
+        SELECT keyword, singleLink, NULLIF(comparePriceLink, '') AS comparePriceLink, MAX(seq) as seq
         FROM slot_ranking
         WHERE DATE(created) = CURDATE()
-        GROUP BY keyword, singleLink
-      ) sr ON s.keyword = sr.keyword AND s.singleLink = sr.singleLink
+        GROUP BY keyword, singleLink, NULLIF(comparePriceLink, '')
+      ) sr ON s.keyword = sr.keyword AND s.singleLink <=> sr.singleLink AND NULLIF(s.comparePriceLink, '') <=> sr.comparePriceLink
     `;
 
     if (rankOption === 1 || rankOption === -1) {

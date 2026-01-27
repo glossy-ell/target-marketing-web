@@ -34,13 +34,13 @@ export async function GET(_: Request, { params }: { params: { seq: string } }) {
 
     // keyword가  일치하는 slot_ranking 가져오기
     let query = `
-     SELECT seq, ranking, keyword, singleLink, created
+     SELECT seq, ranking, keyword, singleLink, comparePriceLink, created
       FROM (
           SELECT *,
-                ROW_NUMBER() OVER (
-               PARTITION BY DATE(created), keyword, singleLink
-               ORDER BY created DESC
-           ) AS rn
+          ROW_NUMBER() OVER (
+           PARTITION BY DATE(created), keyword, singleLink, NULLIF(comparePriceLink, '')
+           ORDER BY created DESC
+         ) AS rn
           FROM slot_ranking
           WHERE keyword = ?
       ) t
@@ -55,6 +55,14 @@ export async function GET(_: Request, { params }: { params: { seq: string } }) {
     } else {
       query += ' AND singleLink = ?';
       sqlParams.push(slot.singleLink);
+    }
+
+    // comparePriceLink 처리 (null 또는 빈 문자열을 동일하게 취급)
+    if (slot.comparePriceLink === null || slot.comparePriceLink === undefined || slot.comparePriceLink === '') {
+      query += " AND (comparePriceLink IS NULL OR comparePriceLink = '')";
+    } else {
+      query += ' AND comparePriceLink = ?';
+      sqlParams.push(slot.comparePriceLink);
     }
 
     query += ' ORDER BY created DESC LIMIT ?';

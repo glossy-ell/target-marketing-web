@@ -517,8 +517,9 @@ const SlotList = (   {
       }
 
     if (!response.ok) {
-      const err = await response.text();
-      throw new Error(err || 'Failed to update slots');
+      const err = await response.json();
+      console.log(err);
+      throw new Error(err.error || 'Failed to update slots');
     }
   };
 
@@ -635,7 +636,7 @@ const SlotList = (   {
       await MySwal.fire({
         icon: 'error',
         title: '수정 실패',
-        text: '문제가 발생했습니다. 다시 시도해주세요.',
+        text: err ? err.message : '문제가 발생했습니다. 다시 시도해주세요.',
         confirmButtonColor: '#282828',
       });
     }
@@ -1090,13 +1091,11 @@ const SlotList = (   {
 
       try {
 
-        //const res = fetch(`http://14.7.33.34/rank/check_slot/${seq}`, {
-
-        fetch(`http://14.7.33.34/rank/check_slot/${seq}`, { method: 'GET' }).catch(() => {})
-        //fetch(`http://localhost:8011/check_slot/${seq}`, { method: 'GET' }).catch(() => {}) // 디버깅
+  
+        //fetch(`http://localhost:8032/check_slot/${seq}`, { method: 'GET' }).catch(() => {}) // 디버깅
+        fetch(`http://target-reward.shop/rank/check_slot/${seq}`, { method: 'GET' }).catch(() => {})
         alert(`순위체크 요청하였습니다\n5분 뒤 다시 확인해주세요.`);
-        // if (!res.ok) throw new Error('순위체크 실패');
-
+    
       } finally {
         setRankingLoadingSlotSeq(null); // 로딩 종료
       }

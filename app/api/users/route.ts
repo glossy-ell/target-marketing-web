@@ -243,7 +243,7 @@ export async function POST(request: Request) {
     // 유저 추가
     const query = `
       INSERT INTO \`User\` (id, name, password, role, agencyId, distributorId,excelAllow,rankingCheckAllow,slotAllow,userAllow)
-      VALUES (?, ?, ?, ?, ?, ?,?,?,?,?,?)
+      VALUES (?, ?, ?, ?, ?, ?,?,?,?,?)
     `;
     const params = [id, name, hashedPassword, role, agencyId, distributorId,excelAllow,rankingCheckAllow,slotAllow,userAllow];
 

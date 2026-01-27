@@ -136,7 +136,7 @@ export async function POST(request: NextRequest, { params }: { params: { page: s
         l.adjustment_day AS adjustmentDay,
         l.slot_seq AS slotSeq,
         l.start_at AS startAt,
-        l.end_at AS endAt,
+        l.end_at AS endAt
       FROM Log l 
       LEFT JOIN \`User\` u ON l.user = u.seq
       LEFT JOIN \`User\` a ON l.agency = a.seq

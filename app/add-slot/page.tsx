@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import PageHeader from '../components/common/PageHeader';
+import { compare } from 'bcryptjs';
 
 interface User {
   seq: number;
@@ -63,32 +64,7 @@ export default function AddSlot() {
     day: '2-digit',
   }).replace(/\. /g, '-').replace(/\.$/, '');
 
-  // const getStartAndEndDate = (duration: number) => {
-  //   const now = new Date();
-  //   const start = new Date();
-
-  //   // 기준: 오늘 날짜가 아닌, "내일 00:00" 기준으로 판단
-  //   const cutoff = new Date();
-  //   cutoff.setHours(0, 0, 0, 0); // 오늘 00:00
-  //   cutoff.setDate(cutoff.getDate() + 1); // 내일 00:00
-
-  //   // 지금 시간이 내일 00:00 이후면 → 시작일은 모레
-  //   if (now >= cutoff) {
-  //     start.setDate(start.getDate() + 2);
-  //   } else {
-  //     // 아직 0시 이전이면 → 시작일은 내일
-  //     start.setDate(start.getDate() + 1);
-  //   }
-
-  //   const end = new Date(start);
-  //   end.setDate(start.getDate() + (duration - 1));
-
-  //   return {
-  //     startDate: formatDate(start),
-  //     endDate: formatDate(end),
-  //   };
-  // };
-
+ 
 
  const getStartAndEndDate = (duration: number) => {
      const start = new Date();
@@ -211,7 +187,19 @@ export default function AddSlot() {
       alert('모든 필드를 올바르게 입력해주세요.');
       return;
     }
+    
 
+
+    const [y, m, d] = startDate.split('-').map(Number);
+    const compareStartDate = new Date(y, m - 1, d);
+    compareStartDate.setHours(0,0,0,0);
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    today.setHours(0,0,0,0);
+    if((compareStartDate < today) && currentUser?.role !== 0){
+      alert('작업 시작일은 오늘 날짜 이후로 설정해야 합니다.');
+      return;
+    }
  
     const slotData = Array.from({ length: Number(quantity) }, () => ({
       userId: selectedUser,
@@ -231,7 +219,10 @@ export default function AddSlot() {
         window.location.href = '/';
         return;
       }
-      if (!response.ok) throw new Error('슬롯 추가 실패');
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || '슬롯 추가에 실패했습니다.');
+      }
 
       alert('슬롯이 성공적으로 추가되었습니다.');
       setSelectedUser('');
@@ -240,7 +231,12 @@ export default function AddSlot() {
       setDates(getStartAndEndDate(7));
     } catch (error) {
       console.error('슬롯 추가 오류:', error);
-      alert('슬롯 추가 중 오류가 발생했습니다.');
+     
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('슬롯 추가 중 오류가 발생했습니다.');
+      }
     }
   };
 

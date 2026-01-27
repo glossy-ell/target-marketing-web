@@ -128,6 +128,22 @@ const SlotTable: React.FC<SlotTableProps> = ({
       endDate: formatDate(new Date(displayEndTime).toISOString())
     };
   };
+
+  function isBeforeToday(dateStr?: string): boolean {
+    if (!dateStr) return false;
+
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    today.setHours(0, 0, 0, 0);
+
+    return date >= today;
+  }
+
+
   return (
     <div className="overflow-x-auto rounded-lg shadow-md">
       <table className="text-xs w-full text-center bg-white rounded-lg overflow-hidden border border-gray-200">
@@ -572,7 +588,10 @@ const SlotTable: React.FC<SlotTableProps> = ({
                         )}
                         {handleEditClick && (
                           <Button
-                            className="bg-[#282828] hover:bg-[#141414] text-white px-2 py-1 rounded-md text-[12px]"
+                            className={`${((currentUser != null && currentUser.role != 0) && isBeforeToday(slot.startDate))
+                              ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed'
+                              : 'bg-[#282828] hover:bg-[#141414]'} text-white px-2 py-1 rounded-md text-[12px]`}
+                            disabled={(currentUser != null && currentUser.role != 0) && isBeforeToday(slot.startDate)}
                             onClick={() => handleEditClick(index)}
                           >
                             수정

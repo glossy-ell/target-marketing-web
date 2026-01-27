@@ -126,11 +126,11 @@ export async function GET(request: Request) {
       LEFT JOIN \`User\` a ON s.agencyId = a.seq
       LEFT JOIN \`User\` d ON s.distributorId = d.seq
       LEFT JOIN (
-        SELECT keyword, singleLink, MAX(seq) as seq
+        SELECT keyword, singleLink, NULLIF(comparePriceLink, '') AS comparePriceLink, MAX(seq) as seq
         FROM slot_ranking
         WHERE DATE(created) = CURDATE()
-        GROUP BY keyword, singleLink
-      ) sr ON s.keyword = sr.keyword AND s.singleLink = sr.singleLink
+        GROUP BY keyword, singleLink, NULLIF(comparePriceLink, '')
+      ) sr ON s.keyword = sr.keyword AND s.singleLink <=> sr.singleLink AND NULLIF(s.comparePriceLink, '') <=> sr.comparePriceLink
     `;
 
     if(rankOption == 1){
@@ -143,19 +143,22 @@ export async function GET(request: Request) {
               sr.ranking,
               DATE(sr.created) AS rankDate,
               sr.created,
+              NULLIF(sr.comparePriceLink, '') AS comparePriceLink,
               ROW_NUMBER() OVER (
-                PARTITION BY sr.singleLink, sr.keyword, DATE(sr.created)
+                PARTITION BY sr.singleLink, sr.keyword, NULLIF(sr.comparePriceLink, ''), DATE(sr.created)
                 ORDER BY sr.created DESC
               ) AS rn
             FROM slot_ranking sr
           )
-          SELECT
-            today.singleLink,
-            today.keyword
+            SELECT
+              today.singleLink,
+              today.keyword,
+              today.comparePriceLink
           FROM RankedSlot today
           JOIN RankedSlot yesterday
             ON today.singleLink <=> yesterday.singleLink
             AND today.keyword <=> yesterday.keyword
+            AND today.comparePriceLink <=> yesterday.comparePriceLink
           WHERE
             today.rn = 1
             AND yesterday.rn = 1
@@ -167,6 +170,8 @@ export async function GET(request: Request) {
           (s.singleLink = rankFilter.singleLink OR (s.singleLink IS NULL AND rankFilter.singleLink IS NULL))
           AND
           (s.keyword = rankFilter.keyword OR (s.keyword IS NULL AND rankFilter.keyword IS NULL))
+          AND
+          (NULLIF(s.comparePriceLink, '') <=> rankFilter.comparePriceLink)
         )
       `;
     }else if(rankOption == -1){
@@ -179,19 +184,22 @@ export async function GET(request: Request) {
               sr.ranking,
               DATE(sr.created) AS rankDate,
               sr.created,
+              NULLIF(sr.comparePriceLink, '') AS comparePriceLink,
               ROW_NUMBER() OVER (
-                PARTITION BY sr.singleLink, sr.keyword, DATE(sr.created)
+                PARTITION BY sr.singleLink, sr.keyword, NULLIF(sr.comparePriceLink, ''), DATE(sr.created)
                 ORDER BY sr.created DESC
               ) AS rn
             FROM slot_ranking sr
           )
           SELECT
             today.singleLink,
-            today.keyword
+            today.keyword,
+            today.comparePriceLink
           FROM RankedSlot today
           JOIN RankedSlot yesterday
             ON today.singleLink <=> yesterday.singleLink
             AND today.keyword <=> yesterday.keyword
+            AND today.comparePriceLink <=> yesterday.comparePriceLink
           WHERE
             today.rn = 1
             AND yesterday.rn = 1
@@ -203,6 +211,8 @@ export async function GET(request: Request) {
           (s.singleLink = rankFilter.singleLink OR (s.singleLink IS NULL AND rankFilter.singleLink IS NULL))
           AND
           (s.keyword = rankFilter.keyword OR (s.keyword IS NULL AND rankFilter.keyword IS NULL))
+          AND
+          (NULLIF(s.comparePriceLink, '') <=> rankFilter.comparePriceLink)
         )
       `;
     }
@@ -278,6 +288,26 @@ export async function POST(request: Request) {
   
     const slots = await request.json();
     const values: any[] = [];
+    if(currentUser?.role !== 0){
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+
+      //날짜 유효성 검사
+      for (const slot of slots) {
+        const [y, m, d] = slot.startDate.split('-').map(Number);
+        const startDate = new Date(y, m - 1, d);
+        startDate.setHours(0, 0, 0, 0);
+
+        if (startDate < today) {
+          return NextResponse.json(
+            { error: '작업 시작일은 오늘 날짜 이후로 설정해야 합니다.' },
+            { status: 400 }
+          );
+        }
+      }
+    }
 
     for (const slot of slots) {
       const [userRows] = await pool.query(
@@ -377,16 +407,36 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: '수정할 슬롯 ID 목록이 없습니다.' }, { status: 400 });
     }
 
-
+    
 
     const [rows] = await pool.query<any[]>(
-      `SELECT seq, keyword, singleLink, memo, mid, comparePriceLink FROM Slot WHERE seq IN (${seqs.map(() => '?').join(',')})`,
+      `SELECT seq, keyword, singleLink, memo, mid, comparePriceLink,startDate FROM Slot WHERE seq IN (${seqs.map(() => '?').join(',')})`,
       seqs
     );
     // 실제 수정할 값 계산
     let hasChanges = false;
     let onlyMemo = false;
 
+    if(currentUser?.role !== 0){
+      for(const row of rows){
+        const today = new Date();
+        today.setDate(today.getDate() + 1);
+        today.setHours(0,0,0,0);
+         if(!row || !row.startDate){
+          console.log(row);
+          return NextResponse.json({ error: `슬롯 정보가 없습니다: ${row.seq}` }, { status: 404 });
+        }
+        
+        const startDate = new Date(row.startDate);
+        startDate.setDate(startDate.getDate());
+        startDate.setHours(0,0,0,0);
+        if(startDate >= today){
+          return NextResponse.json({ error: '구동 시작된 슬롯은 수정할 수 없습니다.' }, { status: 400 });
+        }
+      }
+    }
+
+    const normalizeEmpty = (v: any) => (v === null || v === undefined ? '' : v);
 
     for (const row of rows) { //바뀐값 검사
       if (
@@ -394,7 +444,7 @@ export async function PUT(request: Request) {
         (singleLink !== undefined && singleLink !== row.singleLink) ||
         (memo !== undefined && memo !== row.memo) ||
         (mid !== undefined && mid !== row.mid) ||
-        (comparePriceLink !== undefined && comparePriceLink !== row.comparePriceLink)
+        (comparePriceLink !== undefined && normalizeEmpty(comparePriceLink) !== normalizeEmpty(row.comparePriceLink))
       ) {
         hasChanges = true;
         break;
@@ -403,7 +453,7 @@ export async function PUT(request: Request) {
 
     for (const row of rows) { // 데이터 null 비초기화 조건 검사 
       const isSingleLinkSame = singleLink === undefined || singleLink === row.singleLink;
-      const isDifferent = ((memo !== undefined && memo !== row.memo)  || (keyword !== undefined && keyword !== row.keyword) || (mid !== undefined && mid !== row.mid) || (comparePriceLink !== undefined && comparePriceLink !== row.comparePriceLink)); // 키워드 , 메모 동시 체크 
+      const isDifferent = ((memo !== undefined && memo !== row.memo)  || (keyword !== undefined && keyword !== row.keyword) || (mid !== undefined && mid !== row.mid) || (comparePriceLink !== undefined && normalizeEmpty(comparePriceLink) !== normalizeEmpty(row.comparePriceLink))); // 키워드 , 메모 동시 체크 
       if (
         isSingleLinkSame &&
         isDifferent
