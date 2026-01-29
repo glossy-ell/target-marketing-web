@@ -10,6 +10,7 @@ interface Slot {
   agencyId: string;
   distributorId: string;
   keyword: string;
+  mainKeyword?: string | null;
   startDate: string;
   endDate: string;
   rank: string;
@@ -25,6 +26,7 @@ interface Slot {
  const headerMapKeyword: Record<string, string> = {
       "슬롯번호": "슬롯번호",
       "상점명": `상점 명`,
+   "메인 키워드": "메인 키워드",
       "상품 링크": "상품 링크",
       "가격비교링크": "가격비교링크",
       "시작 날짜": "시작 날짜",
@@ -75,6 +77,7 @@ export default function ExcelUploadPopupPage() {
         '클라이언트 ID',
         '개수',
         '키워드',
+        '메인 키워드',
         '상품 링크',
         '가격비교링크',
         'MID',
@@ -84,7 +87,7 @@ export default function ExcelUploadPopupPage() {
       ];
 
     // 두 번째 행에 샘플값: 타입은 '리워드', 클라이언트 ID는 예시로 채워둠. 나머지는 빈칸.
-    const sampleRow = ['리워드', '-', '1', '', '', '', '2000-01-01', '2000-01-01', ''];
+    const sampleRow = ['리워드', '-', '1', '예시 키워드', '예시 메인키워드', '', '', '2000-01-01', '2000-01-01', '', ''];
     const sheetData = [headers, sampleRow];
 
     const sheet = XLSX.utils.aoa_to_sheet(sheetData);
@@ -248,6 +251,7 @@ export default function ExcelUploadPopupPage() {
       map['클라이언트 ID'] = r['클라이언트 ID'] ?? r['클라이언트'] ?? r['클라이언트 id'] ?? r['ClientId'] ?? '';
       map['개수'] = r['개수'] ?? r['count'] ?? r['개수'] ?? 1;
       map['키워드'] = r['키워드'] ?? r['검색어'] ?? '';
+      map['메인 키워드'] = r['메인 키워드'] ?? r['메인키워드'] ?? r['mainKeyword'] ?? '';
       map['상품 링크'] = r['상품 링크'] ?? r['상품 URL'] ?? '';
       map['가격비교링크'] = r['가격비교링크'] ?? r['가격비교 링크'] ?? '';
       map['MID'] = r['MID'] ?? '';

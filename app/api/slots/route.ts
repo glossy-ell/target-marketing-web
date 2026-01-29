@@ -45,9 +45,13 @@ export async function GET(request: Request) {
     const userId = searchParams.get('userId');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
+    const startStartDate = searchParams.get('startSearchStartDate'); // s.startDate >= startStartDate
+    const startEndDate = searchParams.get('startSearchEndDate');     // s.startDate <= startEndDate
+    const endStartDate = searchParams.get('endSearchStartDate');     // s.endDate >= endStartDate
+    const endEndDate = searchParams.get('endSearchEndDate');         // s.endDate <= endEndDate
 
     const offset = (page - 1) * pageSize;
-
+   
     const params: any[] = [];
     let whereClause = 'WHERE 1=1';
 
@@ -65,12 +69,14 @@ export async function GET(request: Request) {
     if (keyword) {
       whereClause += ` AND (
         s.keyword LIKE ? OR
+        s.mainKeyword LIKE ? OR
         u.id LIKE ? OR 
         s.singleLink LIKE ? OR
         s.comparePriceLink LIKE ? OR
         s.mid LIKE ?
       )`;
       params.push(
+        `%${keyword}%`,
         `%${keyword}%`,
         `%${keyword}%`,
         `%${keyword}%`,
@@ -84,6 +90,7 @@ export async function GET(request: Request) {
       params.push(userId);
     }
 
+    // 기존 단일 파라미터 유지(하위 호환)
     if (startDate) {
       whereClause += ' AND s.startDate >= ?';
       params.push(startDate);
@@ -92,6 +99,24 @@ export async function GET(request: Request) {
     if (endDate) {
       whereClause += ' AND s.endDate <= ?';
       params.push(endDate);
+    }
+
+    // 범위 기반 필터 (클라이언트에서 YYYY-MM-DD HH:mm:ss.SSS 형식으로 전달)
+    if (startStartDate) {
+      whereClause += ' AND s.startDate >= ?';
+      params.push(startStartDate);
+    }
+    if (startEndDate) {
+      whereClause += ' AND s.startDate <= ?';
+      params.push(startEndDate);
+    }
+    if (endStartDate) {
+      whereClause += ' AND s.endDate >= ?';
+      params.push(endStartDate);
+    }
+    if (endEndDate) {
+      whereClause += ' AND s.endDate <= ?';
+      params.push(endEndDate);
     }
     whereClause += ' AND s.endDate >= CURDATE()'; // 만료 슬롯 제외
     //검색타입
@@ -225,7 +250,8 @@ export async function GET(request: Request) {
         CONCAT(u.id, '\n(', u.name, ')') AS userId,
         CONCAT(a.id, '\n(', a.name, ')') AS agencyId,
         CONCAT(d.id, '\n(', d.name, ')') AS distributorId,
-        s.keyword, 
+        s.keyword,
+        s.mainKeyword,
         s.startDate, 
         s.endDate, 
         s.rank,
@@ -266,6 +292,7 @@ export async function GET(request: Request) {
       ...row,
       startDate: row.startDate ? convertToKSTDate(row.startDate) : null,
       endDate: row.endDate ? convertToKSTDate(row.endDate) : null,
+      mainKeyword: row.mainKeyword || null,
     }));
 
     return NextResponse.json({ data: convertedRows, totalPages });
@@ -401,8 +428,7 @@ export async function PUT(request: Request) {
 
 
     const body = await request.json();
-    const { seqs, keyword, memo ,singleLink, mid, comparePriceLink} = body;
-
+    const { seqs, keyword, mainKeyword, memo ,singleLink, mid, comparePriceLink} = body;
     if (!Array.isArray(seqs) || seqs.length === 0) {
       return NextResponse.json({ error: '수정할 슬롯 ID 목록이 없습니다.' }, { status: 400 });
     }
@@ -410,7 +436,7 @@ export async function PUT(request: Request) {
     
 
     const [rows] = await pool.query<any[]>(
-      `SELECT seq, keyword, singleLink, memo, mid, comparePriceLink,startDate FROM Slot WHERE seq IN (${seqs.map(() => '?').join(',')})`,
+      `SELECT seq, keyword, mainKeyword, singleLink, memo, mid, comparePriceLink,startDate FROM Slot WHERE seq IN (${seqs.map(() => '?').join(',')})`,
       seqs
     );
     // 실제 수정할 값 계산
@@ -423,14 +449,14 @@ export async function PUT(request: Request) {
         today.setDate(today.getDate() + 1);
         today.setHours(0,0,0,0);
          if(!row || !row.startDate){
-          console.log(row);
+
           return NextResponse.json({ error: `슬롯 정보가 없습니다: ${row.seq}` }, { status: 404 });
         }
         
         const startDate = new Date(row.startDate);
         startDate.setDate(startDate.getDate());
         startDate.setHours(0,0,0,0);
-        if(startDate >= today){
+        if(startDate < today){
           return NextResponse.json({ error: '구동 시작된 슬롯은 수정할 수 없습니다.' }, { status: 400 });
         }
       }
@@ -441,6 +467,7 @@ export async function PUT(request: Request) {
     for (const row of rows) { //바뀐값 검사
       if (
         (keyword !== undefined && keyword !== row.keyword) ||
+        (mainKeyword !== undefined && mainKeyword !== row.mainKeyword) ||
         (singleLink !== undefined && singleLink !== row.singleLink) ||
         (memo !== undefined && memo !== row.memo) ||
         (mid !== undefined && mid !== row.mid) ||
@@ -453,7 +480,7 @@ export async function PUT(request: Request) {
 
     for (const row of rows) { // 데이터 null 비초기화 조건 검사 
       const isSingleLinkSame = singleLink === undefined || singleLink === row.singleLink;
-      const isDifferent = ((memo !== undefined && memo !== row.memo)  || (keyword !== undefined && keyword !== row.keyword) || (mid !== undefined && mid !== row.mid) || (comparePriceLink !== undefined && normalizeEmpty(comparePriceLink) !== normalizeEmpty(row.comparePriceLink))); // 키워드 , 메모 동시 체크 
+      const isDifferent = ((memo !== undefined && memo !== row.memo)  || (keyword !== undefined && keyword !== row.keyword) || (mainKeyword !== undefined && mainKeyword !== row.mainKeyword) || (mid !== undefined && mid !== row.mid) || (comparePriceLink !== undefined && normalizeEmpty(comparePriceLink) !== normalizeEmpty(row.comparePriceLink))); // 키워드 , 메모 동시 체크 
       if (
         isSingleLinkSame &&
         isDifferent
@@ -480,6 +507,10 @@ export async function PUT(request: Request) {
     if (keyword !== undefined) {
       fields.push('keyword = ?');
       values.push(keyword);
+    }
+    if (mainKeyword !== undefined) {
+      fields.push('mainKeyword = ?');
+      values.push(mainKeyword);
     }
     if (memo !== undefined) {
       fields.push('memo = ?');

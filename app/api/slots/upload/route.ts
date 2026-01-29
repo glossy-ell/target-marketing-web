@@ -50,6 +50,7 @@ export async function POST(request: Request) {
       const row = rows[i];
       const clientId = (row['클라이언트 ID'] || row['클라이언트'] || '').toString().trim();
       const keyword = (row['키워드'] || row['검색어'] || '').toString().trim();
+      const mainKeyword = (row['메인 키워드'] || row['메인키워드'] || row['mainKeyword'] || '').toString().trim();
       const singleLink = row['상품 링크'] || row['상품 URL'] || '';
       const comparePriceLink = row['가격비교링크'] || '';
       const mid = row['MID'] || '';
@@ -101,6 +102,7 @@ export async function POST(request: Request) {
         agencyId,
         distributorId,
         keyword || null,
+        mainKeyword || null,
         startAt,
         endAt,
         singleLink || null,
@@ -112,7 +114,7 @@ export async function POST(request: Request) {
 
     // bulk insert
     const insertQuery = `
-      INSERT INTO Slot (userId, agencyId, distributorId, keyword, startDate, endDate, singleLink, comparePriceLink, mid, memo)
+      INSERT INTO Slot (userId, agencyId, distributorId, keyword, mainKeyword, startDate, endDate, singleLink, comparePriceLink, mid, memo)
       VALUES ?
     `;
     const [result] = await pool.query(insertQuery, [values]);

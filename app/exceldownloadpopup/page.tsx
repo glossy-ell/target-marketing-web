@@ -19,6 +19,7 @@ interface Slot {
   agencyId: string;
   distributorId: string;
   keyword: string;
+  mainKeyword?: string | null;
   startDate: string;
   endDate: string;
   rank: number;
@@ -259,6 +260,7 @@ const SlotList = () => {
         // 항상 포함되는 필드
         baseRow['클라이언트 ID'] = slot.userId || '-';
         baseRow['키워드'] = slot.keyword ?? '';
+        baseRow['메인 키워드'] = slot.mainKeyword ?? '';
         baseRow['상품 링크'] = slot.singleLink ?? '';
         baseRow['가격비교링크'] = slot.comparePriceLink ?? '-';
         baseRow['MID'] = slot.mid ?? '';
@@ -347,7 +349,7 @@ const SlotList = () => {
           if (header === '타입') return { wch: 10 };
           if (header === '총판 ID' || header === '대행 ID') return { wch: 20 };
           if (header === '클라이언트 ID') return { wch: 20 };
-          if (header === '키워드') return { wch: 25 };
+          if (header === '키워드' || header === '메인 키워드') return { wch: 25 };
           if (header === '상품 링크' || header === '가격비교링크') return { wch: 60 };
           if (header === 'MID') return { wch: 30 };
           if (header === '시작일' || header === '종료일') return { wch: 15 };

@@ -19,6 +19,7 @@ interface Slot {
   agencyId: string;
   distributorId: string;
   keyword: string;
+  mainKeyword?: string | null;
   startDate: string;
   endDate: string;
   rank: number;
@@ -43,7 +44,7 @@ interface SlotTableProps {
   // Optional props for editing functionality
   editIndex?: number | null;
   editedSlot?: Partial<Slot>;
-  handleInputChange?: (field: keyof Slot, value: string) => void;
+  handleInputChange?: (field: any, value: string) => void;
   handleConfirm?: (seq: number) => void;
   handleCancel?: () => void;
   
@@ -137,10 +138,10 @@ const SlotTable: React.FC<SlotTableProps> = ({
     date.setHours(0, 0, 0, 0);
 
     const today = new Date();
-    today.setDate(today.getDate() + 1);
+    today.setDate(today.getDate());
     today.setHours(0, 0, 0, 0);
-
-    return date >= today;
+    console.log(date, today);
+    return date < today;
   }
 
 
@@ -170,7 +171,8 @@ const SlotTable: React.FC<SlotTableProps> = ({
             )}
             <th className="px-5 py-4 border-b border-gray-300">상태</th>
             <th className="px-5 py-4 border-b border-gray-300">클라이언트 ID</th>
-            <th className="px-5 py-4 border-b border-gray-300">키워드</th>
+            <th className="px-5 py-4 border-b border-gray-300">순위 키워드</th>
+            <th className="px-5 py-4 border-b border-gray-300">메인 키워드</th>
             <th className="px-5 py-4 border-b border-gray-300">상품 링크</th>
             <th className="px-5 py-4 border-b border-gray-300">가격비교링크</th>
             <th className="px-5 py-4 border-b border-gray-300">MID</th>
@@ -381,6 +383,17 @@ const SlotTable: React.FC<SlotTableProps> = ({
                         )}
                       </div>
                     </>
+                  )}
+                </td>
+                <td className="p-3 border-b border-gray-200 max-w-xs break-words">
+                  {isEditing && handleInputChange ? (
+                    <input
+                      className="bg-white text-black border border-gray-300 px-3 py-1 w-full rounded-md"
+                      value={editedSlot.mainKeyword || ''}
+                      onChange={(e) => handleInputChange('mainKeyword', e.target.value)}
+                    />
+                  ) : (
+                    slot.mainKeyword || '-'
                   )}
                 </td>
                 <Tooltip.Provider delayDuration={100}>

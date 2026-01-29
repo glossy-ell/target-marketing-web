@@ -9,6 +9,11 @@ import { useRouter } from 'next/navigation';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import ReactDatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
+import { addMonths, set } from "date-fns";
+import { ko } from 'date-fns/locale';
+import { start } from 'repl';
 
 interface Slot {
   seq: number;
@@ -69,8 +74,8 @@ const SlotList = (   {
 
   const [search, setSearch] = useState('');
   const [inputValue, setInputValue] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+
+  
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -87,12 +92,26 @@ const SlotList = (   {
 
 
   const [targetSlot,setTargetSlot] = useState<Slot[]>([]); //키워드
-  const router = useRouter();
+  
 
   const [rankOption, setRankOption] = useState<-1 | 0 | 1>(0);
   const [weekendOpen,setWeekendOpen] = useState<boolean>(false);
 
 
+  //시작일 필터
+  const [startSearchStartDate, setStartSearchStartDate] = useState<Date | null>(null);
+  const [selectedDate1, setSelectedDate1] = useState<Date | null>(null);
+
+  const [startSearchendDate, setStartSearchEndDate] = useState<Date | null>(null);
+  const [selectedDate2, setSelectedDate2] = useState<Date | null>(null);
+
+
+  //종료일 필터
+  const [endSearchStartDate, setEndSearchStartDate] = useState<Date | null>(null);
+  const [selectedDate3, setSelectedDate3] = useState<Date | null>(null);
+
+  const [endSearchEndDate, setEndSearchEndDate] = useState<Date | null>(null);
+  const [selectedDate4, setSelectedDate4] = useState<Date | null>(null);
 
 
 
@@ -167,14 +186,33 @@ const SlotList = (   {
 
     setLoading(true);
     setError(null);
+  
+  
     try {
-      const params = new URLSearchParams({
-        search,
-        rankOption: rankOption.toString(),
-        page: page.toString(),
-        pageSize: itemsPerPage.toString(),
-        slotSearchType :slotSearchType.toString(),
-      });
+      const params = new URLSearchParams();
+      params.set('search', search);
+      params.set('rankOption', rankOption.toString());
+      params.set('page', page.toString());
+      params.set('pageSize', itemsPerPage.toString());
+      params.set('slotSearchType', slotSearchType.toString());
+
+      const toDBDateString = (d: Date | null, endOfDay = false) => {
+        if (!d) return null;
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day} ${endOfDay ? '23:59:59.999' : '00:00:00.000'}`;
+      };
+
+      const sss = toDBDateString(startSearchStartDate, false);
+      const sse = toDBDateString(startSearchendDate, true);
+      const ess = toDBDateString(endSearchStartDate, false);
+      const ese = toDBDateString(endSearchEndDate, true);
+
+      if (sss) params.set('startSearchStartDate', sss);
+      if (sse) params.set('startSearchEndDate', sse);
+      if (ess) params.set('endSearchStartDate', ess);
+      if (ese) params.set('endSearchEndDate', ese);
 
 
 
@@ -212,7 +250,7 @@ const SlotList = (   {
 
   useEffect(() => {
     fetchSlots();
-  }, [search, page, itemsPerPage,searchStart]);
+  }, [search, page, itemsPerPage,searchStart,startSearchStartDate,startSearchendDate,endSearchStartDate,endSearchEndDate,slotSearchType,rankOption]);
 
 
 
@@ -912,7 +950,7 @@ const SlotList = (   {
             rankOption: rankOption.toString(),
             page: page.toString(),
             pageSize: itemsPerPage.toString(),
-            slotSearchType : slotSearchType.toString(),
+            slotSearchType :slotSearchType.toString(),
           });
 
 
@@ -1106,13 +1144,15 @@ const SlotList = (   {
 
   return (
     <div className="px-8 py-6 bg-white text-black min-h-screen rounded-lg shadow-lg">
-      <div className="mb-3 flex items-center gap-2 justify-between w-full">
-        {/* 왼쪽: 검색창 */}
-        <div className="flex items-center gap-2 w-[750px]">
+      <div className="mb-3 w-full">
+        {/* 1행: 검색 / 필터 */}
+        <div className="flex items-start gap-2 flex-wrap w-full">
+          {/* 왼쪽: 검색창 */}
+          <div className="flex items-center gap-2 flex-1 min-w-0 max-w-[750px]">
           <input
             type="text"
             placeholder="아이디, 키워드, 상품명, 링크,벤더"
-            className="bg-white text-black border text-xs border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#282828] w-full"
+            className="bg-white text-black border text-xs border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#282828] flex-1 min-w-[450px] max-w-[450px]"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => {
@@ -1140,78 +1180,160 @@ const SlotList = (   {
             </option>
           </select>
 
-          <button
-            style={{ display: currentUser && (currentUser.excelAllow==1)? '':'none' }}
-            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
-            onClick={openExcelPopup}
-          >
-            엑셀 다운로드
-          </button>
+          {/* 날짜 선택 필터 */}
+          <div className="flex items-center gap-2 flex-nowrap">
+            <ReactDatePicker
+              className="min-w-[100px] max-w-[100px] h-8 px-2 border border-gray-300 rounded text-sm"
+              dateFormat="yyyy/M/d"
+              selected={selectedDate1}
+              onChange={(date) => {
+                if (date) {
+                  const d = new Date(date);
+                  d.setHours(0, 0, 0, 0);
+                  setSelectedDate1(d);
+                  setStartSearchStartDate(d);
+                }
+              }}
+              placeholderText="검색 시작일"
+              shouldCloseOnSelect
+              maxDate={addMonths(new Date(), 4)}
+              locale={ko}
+            />
+            <span>~</span>
+            <ReactDatePicker
+              className="min-w-[100px] max-w-[100px] h-8 px-2 border border-gray-300 rounded text-sm"
+              dateFormat="yyyy/M/d"
+              selected={selectedDate2}
+              onChange={(date) => {
+                if (date) {
+                  const d = new Date(date);
+                  d.setHours(0, 0, 0, 0);
+                  setSelectedDate2(d);
+                  setStartSearchEndDate(d);
+                }
+              }}
+              placeholderText="검색 종료일"
+              shouldCloseOnSelect
+              maxDate={addMonths(new Date(), 4)}
+              locale={ko}
+            />
+          </div>
 
-          <button
-            style={{ display: currentUser && (currentUser.excelAllow==1)? '':'none' }}
-            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
-            onClick={openExcelTotalPopup}
-          >
-            엑셀 전체 다운로드
-          </button>
-          {
-            <button
-            style={{ display: currentUser && (currentUser.excelAllow==1) && currentUser.role ==0 ? '':'none' }}
-            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
-            onClick={openExcelSpecPopup}
-          >
-            엑셀 일부 다운로드
-          </button>
-          }
+          {/* 슬롯 기간 필터 */}
+          {/* <div className="flex items-center gap-2 flex-nowrap">
+            <ReactDatePicker
+              className="min-w-[100px] max-w-[100px] h-8 px-2 border border-gray-300 rounded text-sm"
+              dateFormat="yyyy/M/d"
+              selected={selectedDate3}
+              onChange={(date) => {
+                if (date) {
+                  const d = new Date(date);
+                  d.setHours(0, 0, 0, 0);
+                  setSelectedDate3(d);
+                  setEndSearchStartDate(d);
+                }
+              }}
+              placeholderText="종료일 검색"
+              shouldCloseOnSelect
+              maxDate={addMonths(new Date(), 4)}
+              locale={ko}
+            />
+            <span>~</span>
+            <ReactDatePicker
+              className="min-w-[100px] max-w-[100px] h-8 px-2 border border-gray-300 rounded text-sm"
+              dateFormat="yyyy/M/d"
+              selected={selectedDate4}
+              onChange={(date) => {
+                if (date) {
+                  const d = new Date(date);
+                  d.setHours(0, 0, 0, 0);
+                  setSelectedDate4(d);
+                  setEndSearchEndDate(d);
+                }
+              }}
+              placeholderText="종료일 검색"
+              shouldCloseOnSelect
+              maxDate={addMonths(new Date(), 4)}
+              locale={ko}
+            />
+          </div> */}
 
-          <button
-            style={{ display: currentUser && currentUser.excelAllow === 1 ? '' : 'none' }}
-            className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
-            onClick={openExcelUploadPopup}
-          >
-            엑셀 업로드
-          </button>
-
+          
+          </div>
         </div>
 
+        {/* 2행: 버튼 영역 */}
+        <div className="mt-2 flex items-center gap-2 justify-between w-full">
+          <div className="flex items-center gap-2">
+            <button
+              style={{ display: currentUser && (currentUser.excelAllow==1)? '':'none' }}
+              className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+              onClick={openExcelPopup}
+            >
+              엑셀 다운로드
+            </button>
 
-        {/* 오른쪽: select + 버튼들 */}
-        <div className="flex items-center gap-2">
-          <select
-            className="border px-3 py-2 rounded-md text-xs"
-            value={itemsPerPage}
-            onChange={(e) => {
-              setItemsPerPage(Number(e.target.value));
-              setPage(1);
-            }}
-          >
-            {[10, 20, 50,100,150,300].map((num) => (
-              <option key={num} value={num}>
-                {num}개씩
-              </option>
-            ))}
-          </select>
+            <button
+              style={{ display: currentUser && (currentUser.excelAllow==1)? '':'none' }}
+              className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+              onClick={openExcelTotalPopup}
+            >
+              엑셀 전체 다운로드
+            </button>
 
-          <button
-            className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 text-sm"
-             style={{ display: currentUser && (currentUser.role==0)? '':'none' }}
-            onClick={handleDelete}
-          >
-            삭제
-          </button>
-          <button
-            className="bg-[#282828] hover:bg-[#141414] text-white px-3 py-2 rounded text-sm"
-            onClick={handleEdit}
-          >
-            수정
-          </button>
-          <button
-            className="bg-[#9760ff] text-white px-3 py-2 rounded hover:bg-[#651eeb] text-sm"
-            onClick={handleExtend}
-          >
-            연장
-          </button>
+            <button
+              style={{ display: currentUser && (currentUser.excelAllow==1) && currentUser.role ==0 ? '':'none' }}
+              className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+              onClick={openExcelSpecPopup}
+            >
+              엑셀 일부 다운로드
+            </button>
+
+            <button
+              style={{ display: currentUser && currentUser.excelAllow === 1 ? '' : 'none' }}
+              className="bg-[#282828] hover:bg-[#141414] text-white px-4 py-2 rounded text-sm whitespace-nowrap"
+              onClick={openExcelUploadPopup}
+            >
+              엑셀 업로드
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              className="border px-3 py-2 rounded-md text-xs"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              {[10, 20, 50,100,150,300].map((num) => (
+                <option key={num} value={num}>
+                  {num}개씩
+                </option>
+              ))}
+            </select>
+
+            <button
+              className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 text-sm"
+               style={{ display: currentUser && (currentUser.role==0)? '':'none' }}
+              onClick={handleDelete}
+            >
+              삭제
+            </button>
+            <button
+              className="bg-[#282828] hover:bg-[#141414] text-white px-3 py-2 rounded text-sm"
+              onClick={handleEdit}
+            >
+              수정
+            </button>
+            <button
+              className="bg-[#9760ff] text-white px-3 py-2 rounded hover:bg-[#651eeb] text-sm"
+              onClick={handleExtend}
+            >
+              연장
+            </button>
+          </div>
         </div>
       </div>
 

@@ -19,6 +19,7 @@ interface Slot {
   agencyId: string;
   distributorId: string;
   keyword: string;
+  mainKeyword?: string | null;
   startDate: string;
   endDate: string;
   rank: number;
@@ -247,6 +248,7 @@ const SlotList = () => {
         // 항상 포함되는 필드
         baseRow['클라이언트 ID'] = slot.userId || '-';
         baseRow['키워드'] = slot.keyword ?? '';
+        baseRow['메인 키워드'] = (slot as any).mainKeyword ?? '';
         baseRow['상품 링크'] = slot.singleLink ?? '';
         baseRow['가격비교링크'] = slot.comparePriceLink ?? '-';
         baseRow['MID'] = slot.mid ?? '';
@@ -338,13 +340,13 @@ const SlotList = () => {
           else if (header === '총판 ID') columnWidths.push({ wch: 20 });
           else if (header === '대행 ID') columnWidths.push({ wch: 20 });
           else if (header === '클라이언트 ID') columnWidths.push({ wch: 20 });
-          else if (header === '키워드') columnWidths.push({ wch: 20 });
+          else if (header === '키워드' || header === '메인 키워드') columnWidths.push({ wch: 25 });
           else if (header === '상품 링크') columnWidths.push({ wch: 60 });
           else if (header === '가격비교링크') columnWidths.push({ wch: 60 });
           else if (header === 'MID') columnWidths.push({ wch: 30 });
-          else if (header === '시작일') columnWidths.push({ wch: 15 });
-          else if (header === '종료일') columnWidths.push({ wch: 15 });
-          else columnWidths.push({ wch: 20 });
+          else if (header === '시작일' || header === '종료일') columnWidths.push({ wch: 15 });
+          else if (header === '메모') columnWidths.push({ wch: 30 });
+          else columnWidths.push({ wch: 15 });
         });
 
         keywordWorkSheet['!cols'] = columnWidths;
